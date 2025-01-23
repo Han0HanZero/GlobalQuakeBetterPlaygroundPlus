@@ -17,7 +17,7 @@
   <h2>What’s Next?</h2>
   <p>Future releases and updates will be made available on our website <a href="https://globalquake.net/" target="_blank">https://globalquake.net/</a>. Stay tuned for more information, including download links and other resources.</p>
   
-  <p>The old source code will remain available on the <strong>main</strong> branch of this repository for viewing purposes only. No further updates or support will be provided for this codebase.</p>
+  <p>The old source code will remain available on the remaining branches of this repository for viewing purposes only. No further updates or support will be provided for this codebase.</p>
 
   <p>We appreciate the community's engagement and contributions, and we hope you’ll continue to follow the journey as the project evolves in its new form.</p>
 
