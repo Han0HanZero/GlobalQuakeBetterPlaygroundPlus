@@ -1,0 +1,5 @@
+{
+  "name": "中国国家地震烈度速报与预警工程测站列表（部分）",
+  "author": "HanZero",
+  "description": "使用AI整理了《2020年以来全国大陆M4.0级及以上地震强震动参数数据集》中出现的所有测站。来自https://data.earthquake.cn/datashare/report.shtml?PAGEID=ground_motion_list。数据截至2026/7/29。"
+}
