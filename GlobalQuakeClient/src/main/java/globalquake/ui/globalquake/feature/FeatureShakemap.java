@@ -1,5 +1,7 @@
 package globalquake.ui.globalquake.feature;
 
+import globalquake.core.GQFonts;
+
 import com.uber.h3core.H3Core;
 import com.uber.h3core.util.LatLng;
 import globalquake.core.Settings;
@@ -171,7 +173,7 @@ public class FeatureShakemap extends RenderFeature<IntensityHex> {
             var centerPonint = renderer.projectPoint(point3D, renderProperties);
 
             graphics.setColor(Color.white);
-            graphics.setFont(new Font("Calibri", Font.BOLD, 16));
+            graphics.setFont(GQFonts.font(Font.BOLD, 16));
             graphics.drawString(level.getFullName(),
                     (int)centerPonint.x - graphics.getFontMetrics().stringWidth(level.getName()) / 2,
                     (int)centerPonint.y + graphics.getFont().getSize() / 2);

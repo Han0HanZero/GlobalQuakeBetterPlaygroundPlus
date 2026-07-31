@@ -3,6 +3,7 @@ package globalquake.core.exception;
 import globalquake.core.action.OpenURLAction;
 import globalquake.core.exception.action.IgnoreAction;
 import globalquake.core.exception.action.TerminateAction;
+import globalquake.ui.i18n.I18n;
 import org.tinylog.Logger;
 
 import javax.swing.*;
@@ -62,7 +63,7 @@ public class ApplicationErrorHandler implements Thread.UncaughtExceptionHandler 
     private void showOOMError(Throwable e) {
         Logger.error(e);
         final Object[] options = getOptionsForDialog(true, false);
-        JOptionPane.showOptionDialog(parent, createOOMPanel(), "Out of memory!", JOptionPane.DEFAULT_OPTION,
+        JOptionPane.showOptionDialog(parent, createOOMPanel(), I18n.get("error.oomTitle"), JOptionPane.DEFAULT_OPTION,
                 JOptionPane.ERROR_MESSAGE, null, options, null);
     }
 
@@ -77,7 +78,7 @@ public class ApplicationErrorHandler implements Thread.UncaughtExceptionHandler 
     }
 
     private void showWarning(String message) {
-        JOptionPane.showMessageDialog(parent, message, "Warning", JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(parent, message, I18n.get("error.warningTitle"), JOptionPane.WARNING_MESSAGE);
     }
 
 
@@ -85,7 +86,7 @@ public class ApplicationErrorHandler implements Thread.UncaughtExceptionHandler 
         if (headless) {
             Logger.info(s);
         } else {
-            JOptionPane.showMessageDialog(parent, s, "Info", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(parent, s, I18n.get("error.infoTitle"), JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -95,7 +96,7 @@ public class ApplicationErrorHandler implements Thread.UncaughtExceptionHandler 
             System.exit(0);
         }
         final Object[] options = getOptionsForDialog(true, true);
-        JOptionPane.showOptionDialog(parent, createDetailedPane(e), "Fatal Error", JOptionPane.DEFAULT_OPTION,
+        JOptionPane.showOptionDialog(parent, createDetailedPane(e), I18n.get("error.fatalTitle"), JOptionPane.DEFAULT_OPTION,
                 JOptionPane.ERROR_MESSAGE, null, options, null);
         errorCount = 0;
     }
@@ -105,8 +106,8 @@ public class ApplicationErrorHandler implements Thread.UncaughtExceptionHandler 
 
         JPanel labelsPanel = new JPanel(new GridLayout(2, 1));
 
-        labelsPanel.add(new JLabel("GlobalQuake has run out of memory!"));
-        labelsPanel.add(new JLabel("Please select less stations or connect to server."));
+        labelsPanel.add(new JLabel(I18n.get("error.oomMsg1")));
+        labelsPanel.add(new JLabel(I18n.get("error.oomMsg2")));
 
         panel.add(labelsPanel, BorderLayout.NORTH);
 
@@ -118,8 +119,8 @@ public class ApplicationErrorHandler implements Thread.UncaughtExceptionHandler 
 
         JPanel labelsPanel = new JPanel(new GridLayout(2, 1));
 
-        labelsPanel.add(new JLabel("Oops! Something has gone terribly wrong inside GlobalQuake."));
-        labelsPanel.add(new JLabel("Please send the following text to the developers so that they can fix it ASAP:"));
+        labelsPanel.add(new JLabel(I18n.get("error.detailedMsg1")));
+        labelsPanel.add(new JLabel(I18n.get("error.detailedMsg2")));
 
         panel.add(labelsPanel, BorderLayout.NORTH);
 
@@ -134,7 +135,7 @@ public class ApplicationErrorHandler implements Thread.UncaughtExceptionHandler 
     }
 
     private void showGeneralError(String message, boolean isFatal) {
-        final String title = isFatal ? "Fatal Error" : "Application Error";
+        final String title = isFatal ? I18n.get("error.fatalTitle") : I18n.get("error.appTitle");
         final Object[] options = getOptionsForDialog(isFatal, true);
 
         JOptionPane.showOptionDialog(parent, message, title, JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null,
@@ -148,7 +149,7 @@ public class ApplicationErrorHandler implements Thread.UncaughtExceptionHandler 
 
         if (github) {
 
-            return new Component[]{new JButton(new TerminateAction()), new JButton(new OpenURLAction("https://github.com/xspanger3770/GlobalQuake/issues", "Open issue on GitHub")),
+            return new Component[]{new JButton(new TerminateAction()), new JButton(new OpenURLAction("https://github.com/xspanger3770/GlobalQuake/issues", I18n.get("error.openIssue"))),
                     new JButton(new IgnoreAction())};
         } else {
             return new Component[]{new JButton(new TerminateAction()), new JButton(new IgnoreAction())};

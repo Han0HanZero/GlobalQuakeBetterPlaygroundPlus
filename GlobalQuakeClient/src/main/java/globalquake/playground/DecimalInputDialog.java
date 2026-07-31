@@ -1,5 +1,6 @@
 package globalquake.playground;
 
+import globalquake.ui.i18n.I18n;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -52,8 +53,8 @@ public class DecimalInputDialog extends JDialog {
     }
 
     private JPanel createButtonsPanel(Runnable action) {
-        JButton okButton = new JButton("OK");
-        JButton cancelButton = new JButton("Cancel");
+        JButton okButton = new JButton(I18n.get("common.ok"));
+        JButton cancelButton = new JButton(I18n.get("common.cancel"));
 
         okButton.addActionListener(e -> {
             dispose();

@@ -1,5 +1,7 @@
 package globalquake.ui.database;
 
+import globalquake.core.GQFonts;
+
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.ui.action.source.AddStationSourceAction;
 import globalquake.ui.action.source.EditStationSourceAction;
@@ -76,7 +78,7 @@ public class StationSourcesPanel extends JPanel {
 
     private JTable createTable() {
         JTable table = new JTable(tableModel = new StationSourcesTableModel(manager.getStationDatabase().getStationSources()));
-        table.setFont(new Font("Arial", Font.PLAIN, 14));
+        table.setFont(GQFonts.font(Font.PLAIN, 14));
         table.setRowHeight(20);
         table.setGridColor(Color.black);
         table.setShowGrid(true);

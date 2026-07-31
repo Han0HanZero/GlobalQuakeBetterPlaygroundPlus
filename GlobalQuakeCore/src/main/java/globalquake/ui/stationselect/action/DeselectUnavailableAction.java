@@ -1,5 +1,6 @@
 package globalquake.ui.stationselect.action;
 
+import globalquake.ui.i18n.I18n;
 import globalquake.core.database.Network;
 import globalquake.core.database.Station;
 import globalquake.core.database.StationDatabaseManager;
@@ -48,7 +49,7 @@ public class DeselectUnavailableAction extends AbstractAction {
                 });
             }
             if(alreadyDeselected){
-                JOptionPane.showMessageDialog(parent, "All Unavailable Stations Already Deselected");
+                JOptionPane.showMessageDialog(parent, I18n.get("stationselect.alreadyDeselected"));
             }
             stationDatabaseManager.fireUpdateEvent();
         }finally {

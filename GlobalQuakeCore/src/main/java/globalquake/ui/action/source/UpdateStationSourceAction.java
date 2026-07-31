@@ -1,6 +1,7 @@
 package globalquake.ui.action.source;
 
 
+import globalquake.ui.i18n.I18n;
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.core.database.StationSource;
 import globalquake.core.exception.RuntimeApplicationException;
@@ -22,10 +23,10 @@ public class UpdateStationSourceAction extends AbstractAction {
     private JTable table;
 
     public UpdateStationSourceAction(StationDatabaseManager databaseManager) {
-        super("Update");
+        super(I18n.get("action.update"));
         this.databaseManager = databaseManager;
 
-        putValue(SHORT_DESCRIPTION, "Update Station Sources");
+        putValue(SHORT_DESCRIPTION, I18n.get("action.updateSourceTip"));
 
         ImageIcon updateIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image_icons/update.png")));
         Image image = updateIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);

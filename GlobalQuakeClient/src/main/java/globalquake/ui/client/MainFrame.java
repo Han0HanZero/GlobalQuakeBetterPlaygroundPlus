@@ -1,5 +1,7 @@
 package globalquake.ui.client;
 
+import globalquake.core.GQFonts;
+
 import globalquake.core.Settings;
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.core.database.StationSource;
@@ -16,6 +18,7 @@ import globalquake.playground.GlobalQuakePlayground;
 import globalquake.sounds.Sounds;
 import globalquake.ui.GQFrame;
 import globalquake.ui.database.DatabaseMonitorFrame;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.settings.SettingsFrame;
 import globalquake.utils.Scale;
 
@@ -75,33 +78,33 @@ public class MainFrame extends GQFrame {
     private static int phase = 0;
 
     private void initAll() throws Exception {
-        getProgressBar().setString("Loading regions...");
+        getProgressBar().setString(I18n.get("main.loading.regions"));
         getProgressBar().setValue((int) ((phase++ / PHASES) * 100.0));
         Regions.init();
-        getProgressBar().setString("Loading scales...");
+        getProgressBar().setString(I18n.get("main.loading.scales"));
         getProgressBar().setValue((int) ((phase++ / PHASES) * 100.0));
         Scale.load();
-        getProgressBar().setString("Loading shakemap...");
+        getProgressBar().setString(I18n.get("main.loading.shakemap"));
         getProgressBar().setValue((int) ((phase++ / PHASES) * 100.0));
         ShakeMap.init();
-        getProgressBar().setString("Loading sounds...");
+        getProgressBar().setString(I18n.get("main.loading.sounds"));
         getProgressBar().setValue((int) ((phase++ / PHASES) * 100.0));
         try {
             //Sound may fail to load for a variety of reasons. If it does, this method disables sound.
             Sounds.load();
         } catch (Exception e) {
-            RuntimeApplicationException error = new RuntimeApplicationException("Failed to load sounds. Sound will be disabled", e);
+            RuntimeApplicationException error = new RuntimeApplicationException(I18n.get("main.loading.soundsFailed"), e);
             Main.getErrorHandler().handleWarning(error);
         }
-        getProgressBar().setString("Loading travel table...");
+        getProgressBar().setString(I18n.get("main.loading.travelTable"));
         getProgressBar().setValue((int) ((phase++ / PHASES) * 100.0));
         TauPTravelTimeCalculator.init();
 
-        getProgressBar().setString("Trying to load CUDA library...");
+        getProgressBar().setString(I18n.get("main.loading.cuda"));
         getProgressBar().setValue((int) ((phase++ / PHASES) * 100.0));
         GQHypocs.load();
 
-        getProgressBar().setString("Done");
+        getProgressBar().setString(I18n.get("main.loading.done"));
         getProgressBar().setValue((int) ((phase++ / PHASES) * 100.0));
     }
 
@@ -112,10 +115,10 @@ public class MainFrame extends GQFrame {
         panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
         JLabel titleLabel = new JLabel(Main.fullName, SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        titleLabel.setFont(GQFonts.font(Font.BOLD, 32));
         panel.add(titleLabel);
 
-        hostButton = new JButton("Run Locally");
+        hostButton = new JButton(I18n.get("main.runLocally"));
         hostButton.setEnabled(loaded);
         panel.add(hostButton);
 
@@ -128,7 +131,7 @@ public class MainFrame extends GQFrame {
             }
         });
 
-        connectButton = new JButton("Connect to Server");
+        connectButton = new JButton(I18n.get("main.connectServer"));
         connectButton.setEnabled(loaded);
         panel.add(connectButton);
 
@@ -137,7 +140,7 @@ public class MainFrame extends GQFrame {
             new ServerSelectionFrame().setVisible(true);
         });
 
-        playgroundButton = new JButton("Playground Mode (beta)");
+        playgroundButton = new JButton(I18n.get("main.playground"));
         playgroundButton.setEnabled(loaded);
         panel.add(playgroundButton);
 
@@ -158,7 +161,7 @@ public class MainFrame extends GQFrame {
         grid2.setHgap(10);
         JPanel buttons2 = new JPanel(grid2);
 
-        settingsButton = new JButton("Settings");
+        settingsButton = new JButton(I18n.get("main.menu.settings"));
         settingsButton.setEnabled(false);
         // Listener for settings panel button
         settingsButton.addActionListener(actionEvent -> {
@@ -174,7 +177,7 @@ public class MainFrame extends GQFrame {
 
         buttons2.add(settingsButton);
 
-        JButton exitButton = new JButton("Exit");
+        JButton exitButton = new JButton(I18n.get("main.exit"));
         exitButton.addActionListener(actionEvent -> System.exit(0));
         buttons2.add(exitButton);
         return buttons2;
@@ -220,7 +223,7 @@ public class MainFrame extends GQFrame {
                         }
                         databaseMonitorFrame.initDone();
 
-                        updateProgressBar("Done", (int) ((phase++ / (PHASES + 4)) * 100.0));
+                        updateProgressBar(I18n.get("main.loading.done"), (int) ((phase++ / (PHASES + 4)) * 100.0));
                     });
                 });
     }

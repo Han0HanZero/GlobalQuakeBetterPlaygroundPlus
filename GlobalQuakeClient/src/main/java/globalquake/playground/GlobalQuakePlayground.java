@@ -1,5 +1,6 @@
 package globalquake.playground;
 
+import globalquake.ui.i18n.I18n;
 import globalquake.client.GlobalQuakeLocal;
 import globalquake.core.GlobalQuake;
 import globalquake.core.archive.EarthquakeArchive;
@@ -163,7 +164,7 @@ public class GlobalQuakePlayground extends GlobalQuakeLocal {
     }
 
     public String getWatermark() {
-        return "Playground Mode";
+        return I18n.get("playground.watermark");
     }
 
     @Override

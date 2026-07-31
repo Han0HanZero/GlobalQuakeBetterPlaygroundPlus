@@ -110,6 +110,7 @@ public final class Settings {
     public static Integer selectedEventColorIndex;
 
     public static Integer distanceUnitsIndex;
+    public static Integer languageIndex;
     public static Boolean focusOnEvent;
     public static Boolean jumpToAlert;
 
@@ -183,6 +184,8 @@ public final class Settings {
     static {
         load();
         save();
+        globalquake.ui.i18n.I18n.applyLanguage(languageIndex);
+        GQFonts.init();
         try {
             runUpdateService();
         } catch (IOException e) {
@@ -272,6 +275,7 @@ public final class Settings {
         loadProperty("jumpToAlert", "true");
 
         loadProperty("distanceUnitsIndex", "0", o -> validateInt(0, DistanceUnit.values().length - 1, (Integer) o));
+        loadProperty("languageIndex", "0", o -> validateInt(0, 1, (Integer) o));
 
         loadProperty("selectedEventColorIndex", "0", o -> validateInt(0, 2, (Integer) o));
         loadProperty("stationsSizeMul", "1.0", o -> validateDouble(0, 10, (Double) o));

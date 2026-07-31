@@ -1,6 +1,7 @@
 package gqserver.ui.server.table.model;
 
 import globalquake.core.earthquake.data.Cluster;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.table.Column;
 import globalquake.ui.table.FilterableTableModel;
 import globalquake.ui.table.TableCellRendererAdapter;
@@ -11,8 +12,8 @@ import java.util.UUID;
 
 public class ClusterTableModel extends FilterableTableModel<Cluster> {
     private final List<Column<Cluster, ?>> columns = List.of(
-            Column.readonly("ID", UUID.class, Cluster::getUuid, new TableCellRendererAdapter<>()),
-            Column.readonly("Assigned Events", Integer.class, cluster -> cluster.getAssignedEvents().size(), new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.id"), UUID.class, Cluster::getUuid, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.assignedEvents"), Integer.class, cluster -> cluster.getAssignedEvents().size(), new TableCellRendererAdapter<>()),
             Column.readonly("level", Integer.class, Cluster::getLevel, new TableCellRendererAdapter<>()),
             Column.readonly("rootLat", Double.class, Cluster::getRootLat, new TableCellRendererAdapter<>()),
             Column.readonly("rootLon", Double.class, Cluster::getRootLon, new TableCellRendererAdapter<>()));

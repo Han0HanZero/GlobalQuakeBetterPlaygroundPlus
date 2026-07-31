@@ -1,5 +1,7 @@
 package globalquake.ui.globalquake.feature;
 
+import globalquake.core.GQFonts;
+
 import globalquake.core.GlobalQuake;
 import globalquake.core.earthquake.EarthquakeAnalysis;
 import globalquake.core.earthquake.data.Earthquake;
@@ -15,6 +17,7 @@ import globalquake.ui.globe.feature.RenderElement;
 import globalquake.ui.globe.feature.RenderEntity;
 import globalquake.ui.globe.feature.RenderFeature;
 import globalquake.core.Settings;
+import globalquake.ui.i18n.I18n;
 import globalquake.utils.Scale;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
@@ -205,17 +208,17 @@ public class FeatureEarthquake extends RenderFeature<Earthquake> {
 
             if (isUncertain && (System.currentTimeMillis() / 500) % 2 == 0) {
                 graphics.setColor(Color.WHITE);
-                graphics.setFont(new Font("Calibri", Font.BOLD, 32));
+                graphics.setFont(GQFonts.font(Font.BOLD, 32));
                 String str = "?";
                 graphics.drawString(str, (int) (centerPonint.x - graphics.getFontMetrics().stringWidth(str) / 2), (int) (centerPonint.y + 10));
             }
 
-            String sim = GlobalQuake.instance.isSimulation() ? " (Simulated)" : "";
+            String sim = GlobalQuake.instance.isSimulation() ? I18n.get("panel.simulated") : "";
 
             String str = "M%.1f%s".formatted(entity.getOriginal().getMag(), sim);
 
             graphics.setColor(Color.WHITE);
-            graphics.setFont(new Font("Calibri", Font.BOLD, 16));
+            graphics.setFont(GQFonts.font(Font.BOLD, 16));
             graphics.drawString(str, (int) (centerPonint.x - graphics.getFontMetrics().stringWidth(str) / 2), (int) (centerPonint.y - 18));
 
             str = "%s".formatted(

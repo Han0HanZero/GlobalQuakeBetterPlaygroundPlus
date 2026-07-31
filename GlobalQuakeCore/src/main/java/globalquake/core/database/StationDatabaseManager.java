@@ -1,5 +1,6 @@
 package globalquake.core.database;
 
+import globalquake.ui.i18n.I18n;
 import globalquake.core.GlobalQuake;
 import globalquake.core.exception.FatalIOException;
 import globalquake.core.exception.FdnwsDownloadException;
@@ -110,31 +111,31 @@ public class StationDatabaseManager {
 
         new Thread(() -> {
             toBeUpdated.forEach(stationSource -> {
-                stationSource.getStatus().setString("Queued...");
+                stationSource.getStatus().setString(I18n.get("source.status.queued"));
                 stationSource.getStatus().setValue(0);
             });
             toBeUpdated.parallelStream().forEach(stationSource -> {
                 try {
                     synchronized (statusSync) {
-                        stationSource.getStatus().setString("Updating...");
+                        stationSource.getStatus().setString(I18n.get("source.status.updating"));
                     }
                     List<Network> networkList = FDSNWSDownloader.downloadFDSNWS(stationSource, "");
 
                     synchronized (statusSync) {
-                        stationSource.getStatus().setString("Updating database...");
+                        stationSource.getStatus().setString(I18n.get("source.status.updatingDb"));
                     }
 
                     StationDatabaseManager.this.acceptNetworks(networkList);
 
                     synchronized (statusSync) {
-                        stationSource.getStatus().setString(networkList.size() + " Networks Downloaded");
+                        stationSource.getStatus().setString(I18n.format("source.status.networksDownloaded", networkList.size()));
                         stationSource.getStatus().setValue(100);
                         stationSource.setLastUpdate(LocalDateTime.now());
                     }
                 } catch (SocketTimeoutException e) {
                     Logger.error(e);
                     synchronized (statusSync) {
-                        stationSource.getStatus().setString("Timed out!");
+                        stationSource.getStatus().setString(I18n.get("source.status.timedOut"));
                         stationSource.getStatus().setValue(0);
                     }
                 } catch (FdnwsDownloadException e) {
@@ -146,7 +147,7 @@ public class StationDatabaseManager {
                 } catch (Exception e) {
                     Logger.error(e);
                     synchronized (statusSync) {
-                        stationSource.getStatus().setString("Error!");
+                        stationSource.getStatus().setString(I18n.get("source.status.error"));
                         stationSource.getStatus().setValue(0);
                     }
                 } finally {

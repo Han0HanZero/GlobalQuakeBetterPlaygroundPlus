@@ -3,6 +3,7 @@ package globalquake.ui.dialog;
 import globalquake.core.database.SeedlinkNetwork;
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.core.exception.RuntimeApplicationException;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -24,7 +25,7 @@ public class EditSeedlinkNetworkDialog extends JDialog {
         this.databaseManager = databaseManager;
         setLayout(new BorderLayout());
 
-        setTitle("Edit Seedlink Network");
+        setTitle(I18n.get("seedlink.title"));
         setSize(320, 180);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
@@ -38,20 +39,20 @@ public class EditSeedlinkNetworkDialog extends JDialog {
         hostField = new JTextField(seedlinkNetwork==null ? "" : seedlinkNetwork.getHost(), 40);
         portField = new JTextField(seedlinkNetwork==null ? "18000" : String.valueOf(seedlinkNetwork.getPort()), 40);
         timeoutField = new JTextField(seedlinkNetwork==null ? String.valueOf(SeedlinkNetwork.DEFAULT_TIMEOUT) : String.valueOf(seedlinkNetwork.getTimeout()), 40);
-        JButton saveButton = new JButton("Save");
+        JButton saveButton = new JButton(I18n.get("common.save"));
         saveButton.addActionListener(e -> saveChanges());
-        JButton cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton(I18n.get("common.cancel"));
         cancelButton.addActionListener(actionEvent -> EditSeedlinkNetworkDialog.this.dispose());
 
         JPanel buttonsPanel = new JPanel();
 
-        fieldsPanel.add(new JLabel("Name:"));
+        fieldsPanel.add(new JLabel(I18n.get("seedlink.name")));
         fieldsPanel.add(nameField);
-        fieldsPanel.add(new JLabel("Host:"));
+        fieldsPanel.add(new JLabel(I18n.get("seedlink.host")));
         fieldsPanel.add(hostField);
-        fieldsPanel.add(new JLabel("Port:"));
+        fieldsPanel.add(new JLabel(I18n.get("seedlink.port")));
         fieldsPanel.add(portField);
-        fieldsPanel.add(new JLabel("Timeout (seconds):"));
+        fieldsPanel.add(new JLabel(I18n.get("seedlink.timeout")));
         fieldsPanel.add(timeoutField);
         buttonsPanel.add(cancelButton);
         buttonsPanel.add(saveButton);
@@ -85,7 +86,7 @@ public class EditSeedlinkNetworkDialog extends JDialog {
         try {
             port = Integer.parseInt(portField.getText());
         }catch(NumberFormatException e){
-            throw new RuntimeApplicationException("Invalid port!", e);
+            throw new RuntimeApplicationException(I18n.get("seedlink.invalidPort"), e);
         }
 
         int timeout;
@@ -93,11 +94,11 @@ public class EditSeedlinkNetworkDialog extends JDialog {
         try {
             timeout = Integer.parseInt(timeoutField.getText());
         }catch(NumberFormatException e){
-            throw new RuntimeApplicationException("Invalid timeout!", e);
+            throw new RuntimeApplicationException(I18n.get("seedlink.invalidTimeout"), e);
         }
 
         if(timeout < 5 || timeout > 300){
-            throw new RuntimeApplicationException("Timeout must be between 5s and 300s!");
+            throw new RuntimeApplicationException(I18n.get("seedlink.timeoutRange"));
         }
 
         return new SeedlinkNetwork(nameField.getText(), hostField.getText(), port, timeout);

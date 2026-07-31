@@ -2,6 +2,7 @@ package globalquake.ui.dialog;
 
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.core.database.StationSource;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,7 +22,7 @@ public class EditStationSourceDialog extends JDialog {
         this.stationSource = stationSource;
         setLayout(new BorderLayout());
 
-        setTitle("Edit Station Source");
+        setTitle(I18n.get("source.title"));
         setSize(320, 180);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
@@ -33,16 +34,16 @@ public class EditStationSourceDialog extends JDialog {
 
         nameField = new JTextField(stationSource==null ? "" : stationSource.getName(), 40);
         urlField = new JTextField(stationSource==null ? "" : stationSource.getUrl(), 40);
-        JButton saveButton = new JButton("Save");
+        JButton saveButton = new JButton(I18n.get("common.save"));
         saveButton.addActionListener(e -> saveChanges());
-        JButton cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton(I18n.get("common.cancel"));
         cancelButton.addActionListener(actionEvent -> EditStationSourceDialog.this.dispose());
 
         JPanel buttonsPanel = new JPanel();
 
-        fieldsPanel.add(new JLabel("Name:"));
+        fieldsPanel.add(new JLabel(I18n.get("source.name")));
         fieldsPanel.add(nameField);
-        fieldsPanel.add(new JLabel("URL:"));
+        fieldsPanel.add(new JLabel(I18n.get("source.url")));
         fieldsPanel.add(urlField);
         buttonsPanel.add(cancelButton);
         buttonsPanel.add(saveButton);

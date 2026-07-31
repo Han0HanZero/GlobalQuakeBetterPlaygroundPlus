@@ -3,6 +3,7 @@ package globalquake.ui.action.seedlink;
 import globalquake.core.database.SeedlinkNetwork;
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.ui.dialog.EditSeedlinkNetworkDialog;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.table.FilterableTableModel;
 
 import javax.swing.*;
@@ -19,11 +20,11 @@ public class EditSeedlinkNetworkAction extends AbstractAction {
     private JTable table;
 
     public EditSeedlinkNetworkAction(Window parent, StationDatabaseManager databaseManager){
-        super("Edit");
+        super(I18n.get("action.edit"));
         this.databaseManager = databaseManager;
         this.parent = parent;
 
-        putValue(SHORT_DESCRIPTION, "Edit Seedlink Network");
+        putValue(SHORT_DESCRIPTION, I18n.get("action.editSeedlinkTip"));
 
         ImageIcon editIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image_icons/edit.png")));
         Image image = editIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);

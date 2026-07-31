@@ -5,6 +5,7 @@ import globalquake.core.exception.FatalIOException;
 import globalquake.main.Main;
 import globalquake.ui.GQFrame;
 import globalquake.ui.action.RestoreDatabaseAction;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.stationselect.StationSelectFrame;
 import globalquake.ui.StationCountPanel;
 
@@ -52,7 +53,7 @@ public class DatabaseMonitorFrame extends GQFrame {
         contentPane.add(createTabbedPane(), BorderLayout.CENTER);
 
         pack();
-        setTitle("Station Database Manager");
+        setTitle(I18n.get("db.title"));
         setLocationRelativeTo(null);
 
         runTimer();
@@ -96,9 +97,9 @@ public class DatabaseMonitorFrame extends GQFrame {
 
     private Component createTabbedPane() {
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Seedlink Networks", new SeedlinkServersPanel(
+        tabbedPane.addTab(I18n.get("db.tabSeedlink"), new SeedlinkServersPanel(
                 this, manager,restoreDatabaseAction, getBtnSelectStations(), getBtnLaunch()));
-        tabbedPane.addTab("Station Sources", new StationSourcesPanel(
+        tabbedPane.addTab(I18n.get("db.tabSources"), new StationSourcesPanel(
                 this, manager, restoreDatabaseAction, getBtnSelectStations(), getBtnLaunch()));
         return tabbedPane;
     }
@@ -118,7 +119,7 @@ public class DatabaseMonitorFrame extends GQFrame {
         gridLayout.setHgap(5);
         buttonsPanel.setLayout(gridLayout);
 
-        btnSelectStations = new JButton("Select Stations");
+        btnSelectStations = new JButton(I18n.get("db.selectStations"));
         btnSelectStations.setEnabled(false);
 
         ImageIcon selectStationsIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image_icons/selectStations.png")));
@@ -134,7 +135,7 @@ public class DatabaseMonitorFrame extends GQFrame {
 
         buttonsPanel.add(btnSelectStations);
 
-        btnLaunch = new JButton("Launch %s".formatted(Main.fullName));
+        btnLaunch = new JButton(I18n.format("db.launch", Main.fullName));
         btnLaunch.setEnabled(false);
 
         ImageIcon launchIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image_icons/launchGlobalQuake.png")));
@@ -154,7 +155,7 @@ public class DatabaseMonitorFrame extends GQFrame {
         mainProgressBar  = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
         mainProgressBar.setValue(0);
         mainProgressBar.setStringPainted(true);
-        mainProgressBar.setString("Init...");
+        mainProgressBar.setString(I18n.get("db.init"));
 
         buttonsOutsidePanel.add(buttonsPanel);
         buttonsOutsidePanel.add(mainProgressBar);

@@ -3,8 +3,10 @@ package globalquake.ui.settings;
 import globalquake.core.intensity.IntensityScale;
 import globalquake.core.intensity.IntensityScales;
 import globalquake.core.intensity.Level;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.Objects;
 
@@ -15,6 +17,17 @@ public class IntensityScaleSelector extends JPanel {
 
     public IntensityScaleSelector(String text, int shakingLevelScale, int shakingLevelIndex) {
         shakingScaleComboBox = new JComboBox<>(IntensityScales.INTENSITY_SCALES);
+        shakingScaleComboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof IntensityScale scale) {
+                    label.setText(I18n.get("intensity." + scale.getNameShort().toLowerCase()));
+                }
+                return label;
+            }
+        });
         shakingScaleComboBox.setSelectedIndex(Math.max(0, Math.min(shakingScaleComboBox.getItemCount() - 1, shakingLevelScale)));
         levelComboBox = new JComboBox<>(((IntensityScale) Objects.requireNonNull(shakingScaleComboBox.getSelectedItem())).getLevels().toArray(new Level[0]));
 

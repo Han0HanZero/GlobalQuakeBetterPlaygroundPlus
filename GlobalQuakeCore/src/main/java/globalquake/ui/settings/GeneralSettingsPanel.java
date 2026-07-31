@@ -1,10 +1,12 @@
 package globalquake.ui.settings;
 
 
+import globalquake.core.GQFonts;
 import globalquake.core.Settings;
 import globalquake.core.geo.DistanceUnit;
 import globalquake.core.intensity.IntensityScale;
 import globalquake.core.intensity.IntensityScales;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -40,14 +42,43 @@ public class GeneralSettingsPanel extends SettingsPanel {
 	private void createOtherSettings(SettingsFrame settingsFrame) {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setBorder(BorderFactory.createTitledBorder("Other"));
+		panel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.other")));
+
+		JPanel row0 = new JPanel();
+
+		row0.add(new JLabel(I18n.get("settings.language")));
+
+		JComboBox<String> languageComboBox = new JComboBox<>(new String[]{"简体中文", "English"});
+		languageComboBox.setSelectedIndex(Settings.languageIndex == null ? 0 : Settings.languageIndex);
+		languageComboBox.addActionListener(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				Settings.languageIndex = languageComboBox.getSelectedIndex();
+				I18n.applyLanguage(Settings.languageIndex);
+				settingsFrame.rebuildUI();
+			}
+		});
+
+		row0.add(languageComboBox);
 
 		JPanel row1 = new JPanel();
 
-		row1.add(new JLabel("Distance units: "));
+		row1.add(new JLabel(I18n.get("settings.distanceUnits")));
 
 		distanceUnitJComboBox = new JComboBox<>(DistanceUnit.values());
 		distanceUnitJComboBox.setSelectedIndex(Math.max(0, Math.min(distanceUnitJComboBox.getItemCount() - 1, Settings.distanceUnitsIndex)));
+
+		distanceUnitJComboBox.setRenderer(new DefaultListCellRenderer() {
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+														  boolean isSelected, boolean cellHasFocus) {
+				JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				if (value instanceof DistanceUnit unit) {
+					label.setText(I18n.get("unit." + unit.name().toLowerCase()));
+				}
+				return label;
+			}
+		});
 
 		distanceUnitJComboBox.addItemListener(itemEvent -> {
 			Settings.distanceUnitsIndex = distanceUnitJComboBox.getSelectedIndex();
@@ -58,7 +89,7 @@ public class GeneralSettingsPanel extends SettingsPanel {
 
 		JPanel row2 = new JPanel();
 
-		row2.add(new JLabel("Timezone: "));
+		row2.add(new JLabel(I18n.get("settings.timezone")));
 		Comparator<ZoneId> zoneIdComparator = Comparator.comparingInt(zone -> zone.getRules().getOffset(Instant.now()).getTotalSeconds());
 
 		// Use a DefaultComboBoxModel for better control and management
@@ -107,6 +138,7 @@ public class GeneralSettingsPanel extends SettingsPanel {
 
 		row2.add(timezoneCombobox);
 
+		panel.add(row0);
 		panel.add(row1);
 		panel.add(row2);
 
@@ -115,13 +147,13 @@ public class GeneralSettingsPanel extends SettingsPanel {
 
 	private void createHomeLocationSettings() {
 		JPanel outsidePanel = new JPanel(new BorderLayout());
-		outsidePanel.setBorder(BorderFactory.createTitledBorder("Home location settings"));
+		outsidePanel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.homeLocation")));
 
 		JPanel homeLocationPanel = new JPanel();
 		homeLocationPanel.setLayout(new GridLayout(2,1));
 
-		JLabel lblLat = new JLabel("Home Latitude: ");
-		JLabel lblLon = new JLabel("Home Longitude: ");
+		JLabel lblLat = new JLabel(I18n.get("settings.homeLat"));
+		JLabel lblLon = new JLabel(I18n.get("settings.homeLon"));
 
 		textFieldLat = new JTextField(20);
 		textFieldLat.setText(String.format("%s", Settings.homeLat));
@@ -146,13 +178,13 @@ public class GeneralSettingsPanel extends SettingsPanel {
 		homeLocationPanel.add(latPanel);
 		homeLocationPanel.add(lonPanel);
 
-		JTextArea infoLocation = new JTextArea("Home location will be used for playing additional alarm \n sounds if an earthquake occurs nearby");
+		JTextArea infoLocation = new JTextArea(I18n.get("settings.homeLocationInfo"));
 		infoLocation.setBorder(new EmptyBorder(5,5,5,5));
 		infoLocation.setLineWrap(true);
 		infoLocation.setEditable(false);
 		infoLocation.setBackground(homeLocationPanel.getBackground());
 
-		chkBoxHomeLoc = new JCheckBox("Display home location");
+		chkBoxHomeLoc = new JCheckBox(I18n.get("settings.displayHomeLocation"));
 		chkBoxHomeLoc.setSelected(Settings.displayHomeLocation);
 		outsidePanel.add(chkBoxHomeLoc);
 
@@ -167,8 +199,7 @@ public class GeneralSettingsPanel extends SettingsPanel {
 		sliderStoreTime = HypocenterAnalysisSettingsPanel.createSettingsSlider(2, 20, 2, 1);
 
 		JLabel label = new JLabel();
-		ChangeListener changeListener = changeEvent -> label.setText("Waveform data storage time (minutes): %d".formatted(
-				sliderStoreTime.getValue()));
+		ChangeListener changeListener = changeEvent -> label.setText(I18n.format("settings.waveformStorage", sliderStoreTime.getValue()));
 
 		sliderStoreTime.addChangeListener(changeListener);
 
@@ -176,27 +207,35 @@ public class GeneralSettingsPanel extends SettingsPanel {
 		changeListener.stateChanged(null);
 
 		return HypocenterAnalysisSettingsPanel.createCoolLayout(sliderStoreTime, label, "5",
-				"""
-                        In GlobalQuake, waveform data poses the highest demand on your system's RAM.
-                        If you're encountering memory constraints, you have two options:
-                        either reduce the number of selected stations or lower this specific value.
-                        """);
+				I18n.get("settings.waveformStorageInfo"));
 	}
 
 	private JPanel createIntensitySettingsPanel() {
 		JPanel panel = new JPanel(new GridLayout(2,1));
-		panel.setBorder(BorderFactory.createTitledBorder("Intensity Scale"));
+		panel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.intensityScale")));
 
 		comboBoxScale = new JComboBox<>(IntensityScales.INTENSITY_SCALES);
 		comboBoxScale.setSelectedIndex(Settings.intensityScaleIndex);
+
+		comboBoxScale.setRenderer(new DefaultListCellRenderer() {
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+														  boolean isSelected, boolean cellHasFocus) {
+				JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				if (value instanceof IntensityScale scale) {
+					label.setText(I18n.get("intensity." + scale.getNameShort().toLowerCase()));
+				}
+				return label;
+			}
+		});
 
 		JPanel div = new JPanel();
 		div.add(comboBoxScale);
 		panel.add(div, BorderLayout.CENTER);
 
 		JLabel lbl = new JLabel();
-		lbl.setFont(new Font("Calibri", Font.PLAIN, 13));
-		lbl.setText("Keep in mind that the displayed intensities are estimated, not measured");
+		lbl.setFont(GQFonts.font(Font.PLAIN, 13));
+		lbl.setText(I18n.get("settings.intensityEstimatedInfo"));
 
 
 		panel.add(lbl, BorderLayout.SOUTH);
@@ -206,8 +245,8 @@ public class GeneralSettingsPanel extends SettingsPanel {
 
 	@Override
 	public void save() {
-		Settings.homeLat = parseDouble(textFieldLat.getText(), "Home latitude", -90, 90);
-		Settings.homeLon = parseDouble(textFieldLon.getText(), "Home longitude", -180, 180);
+		Settings.homeLat = parseDouble(textFieldLat.getText(), I18n.get("settings.homeLat"), -90, 90);
+		Settings.homeLon = parseDouble(textFieldLon.getText(), I18n.get("settings.homeLon"), -180, 180);
 		Settings.intensityScaleIndex = comboBoxScale.getSelectedIndex();
 		Settings.displayHomeLocation = chkBoxHomeLoc.isSelected();
 		Settings.distanceUnitsIndex = distanceUnitJComboBox.getSelectedIndex();
@@ -217,6 +256,6 @@ public class GeneralSettingsPanel extends SettingsPanel {
 
 	@Override
 	public String getTitle() {
-		return "General";
+		return I18n.get("settings.general.title");
 	}
 }

@@ -1,9 +1,12 @@
 package globalquake.ui.globalquake;
 
+import globalquake.core.GQFonts;
+
 import globalquake.core.archive.ArchivedQuake;
 import globalquake.core.earthquake.quality.QualityClass;
 import globalquake.core.intensity.IntensityScales;
 import globalquake.core.intensity.Level;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.archived.ArchivedQuakeAnimation;
 import globalquake.ui.archived.ArchivedQuakeUI;
 import globalquake.core.Settings;
@@ -159,7 +162,7 @@ public class EarthquakeListPanel extends JPanel {
                 }
 
                 String str = "M" + f1d.format(quake.getMag());
-                g.setFont(new Font("Calibri", Font.BOLD, 20));
+                g.setFont(GQFonts.font(Font.BOLD, 20));
                 g.setColor(Color.WHITE);
                 g.drawString(str, getWidth() - g.getFontMetrics().stringWidth(str) - 3, y + 44);
 
@@ -171,35 +174,35 @@ public class EarthquakeListPanel extends JPanel {
 
                 if (level != null) {
                     g.setColor(Color.white);
-                    g.setFont(new Font("Arial", Font.PLAIN, 20));
+                    g.setFont(GQFonts.font(Font.PLAIN, 20));
                     g.drawString(level.getSuffix(), 32, y + 21);
 
                 }
 
-                g.setFont(new Font("Calibri", Font.PLAIN, 26));
+                g.setFont(GQFonts.font(Font.PLAIN, 26));
                 g.setColor(Color.white);
                 g.drawString(str, 27 - g.getFontMetrics().stringWidth(str) / 2, y + 30);
 
                 str = Settings.getSelectedDistanceUnit().format(quake.getDepth(), 0);
-                g.setFont(new Font("Calibri", Font.BOLD, 12));
+                g.setFont(GQFonts.font(Font.BOLD, 12));
                 g.setColor(Color.white);
                 g.drawString(str, (int) (25 - g.getFontMetrics().stringWidth(str) * 0.5), y + 46);
 
                 str = quake.getRegion();
-                g.setFont(new Font("Calibri", Font.BOLD, 12));
+                g.setFont(GQFonts.font(Font.BOLD, 12));
                 g.setColor(Color.white);
                 g.drawString(str, 52, y + 18);
 
                 str = Settings.formatDateTime(Instant.ofEpochMilli(quake.getOrigin()));
-                g.setFont(new Font("Calibri", Font.PLAIN, 16));
+                g.setFont(GQFonts.font(Font.PLAIN, 16));
                 g.setColor(Color.white);
                 g.drawString(str, 52, y + 42);
 
                 QualityClass quality = quake.getQualityClass();
-                g.setFont(new Font("Calibri", Font.BOLD, 14));
+                g.setFont(GQFonts.font(Font.BOLD, 14));
                 GlobalQuakePanel.drawAccuracyBox(g, true, "", getWidth() + 4, y + 17, quality.toString(), quality.getColor());
 
-                g.setFont(new Font("Calibri", Font.PLAIN, 16));
+                g.setFont(GQFonts.font(Font.PLAIN, 16));
                 if (quake.isWrong()) {
                     g.setColor(new Color(200, 0, 0));
                     g.setStroke(new BasicStroke(2f));
@@ -215,9 +218,9 @@ public class EarthquakeListPanel extends JPanel {
         g.setStroke(new BasicStroke(1f));
 
         if(i == 0){
-            g.setFont(new Font("Calibri", Font.BOLD, 16));
+            g.setFont(GQFonts.font(Font.BOLD, 16));
             g.setColor(Color.white);
-            String str = "No earthquakes archived";
+            String str = I18n.get("panel.noArchivedQuakes");
             g.drawString(str, getWidth() / 2 - g.getFontMetrics().stringWidth(str) / 2, 22);
         }
 
@@ -231,7 +234,7 @@ public class EarthquakeListPanel extends JPanel {
 
             g.setColor(Color.white);
             g.draw(goUpRectangle);
-            g.setFont(new Font("Calibri", !isMouseInGoUpRect ? Font.PLAIN : Font.BOLD, 32));
+            g.setFont(GQFonts.font(!isMouseInGoUpRect ? Font.PLAIN : Font.BOLD, 32));
             String str = "^";
             g.drawString(str, getWidth() / 2 - g.getFontMetrics().stringWidth(str) / 2, 30);
         }

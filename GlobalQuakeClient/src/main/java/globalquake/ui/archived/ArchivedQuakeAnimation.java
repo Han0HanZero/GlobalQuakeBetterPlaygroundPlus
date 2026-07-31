@@ -2,6 +2,7 @@ package globalquake.ui.archived;
 
 import globalquake.core.Settings;
 import globalquake.core.archive.ArchivedQuake;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +26,7 @@ public class ArchivedQuakeAnimation extends JDialog {
 
         add(mainPanel = new ArchivedQuakePanel(this, quake));
 
-        setTitle("Replay of M%.1f %s".formatted(quake.getMag(), quake.getRegion()));
+        setTitle(I18n.format("archived.replay", quake.getMag(), quake.getRegion()));
         pack();
         setLocationRelativeTo(parent);
 

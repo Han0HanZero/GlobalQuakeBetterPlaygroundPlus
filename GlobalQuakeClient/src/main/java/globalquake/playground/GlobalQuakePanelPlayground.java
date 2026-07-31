@@ -1,5 +1,7 @@
 package globalquake.playground;
 
+import globalquake.core.GQFonts;
+
 import globalquake.core.GlobalQuake;
 import globalquake.core.earthquake.data.Cluster;
 import globalquake.core.earthquake.data.Earthquake;
@@ -13,6 +15,7 @@ import globalquake.ui.globalquake.GlobalQuakePanel;
 import globalquake.ui.globe.GlobeRenderer;
 import globalquake.ui.globe.Polygon3D;
 import globalquake.ui.globe.RenderProperties;
+import globalquake.ui.i18n.I18n;
 import globalquake.utils.GeoUtils;
 import gqserver.api.packets.station.InputType;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -199,6 +202,11 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
     @Override
     public boolean interactionAllowed() {
         return insertType != InsertType.BRUSH_ADD && insertType != InsertType.BRUSH_DELETE;
+    }
+
+    @Override
+    protected boolean showStationsAndSeedlinks() {
+        return false;
     }
 
     @Override
@@ -430,8 +438,8 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
 
         if (folderPath == null) {
             JOptionPane.showMessageDialog(parent,
-                    "No station folder found.",
-                    "Import Stations",
+                    I18n.get("playground.noStationFolder"),
+                    I18n.get("stationimport.title"),
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -451,7 +459,7 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
 
     private void importStationsFromCsv() {
         JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Import Stations from CSV");
+        chooser.setDialogTitle(I18n.get("playground.importCsvTitle"));
         chooser.setFileFilter(new FileNameExtensionFilter("CSV Files (*.csv)", "csv"));
 
         String cwd = System.getProperty("user.dir");
@@ -474,11 +482,11 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
     private void createRandomStations() {
         java.util.List<DecimalInput> inputs = new ArrayList<>();
         DecimalInput radius;
-        inputs.add(radius = new DecimalInput("Radius", 50, 30000, 1000.0));
+        inputs.add(radius = new DecimalInput(I18n.get("playground.input.radius"), 50, 30000, 1000.0));
         DecimalInput amount;
-        inputs.add(amount = new DecimalInput("Amount", 10, 10000, 1000.0));
+        inputs.add(amount = new DecimalInput(I18n.get("playground.input.amount"), 10, 10000, 1000.0));
 
-        new DecimalInputDialog(parent, "Choose parameters", inputs, () -> (((GlobalStationManagerPlayground) GlobalQuake.instance.getStationManager())).generateRandomStations(
+        new DecimalInputDialog(parent, I18n.get("playground.chooseParameters"), inputs, () -> (((GlobalStationManagerPlayground) GlobalQuake.instance.getStationManager())).generateRandomStations(
                 (int) amount.getValue(),
                 radius.getValue(),
                 getRenderer().getRenderProperties().centerLat,
@@ -494,10 +502,10 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
     private void createDebugQuake() {
         java.util.List<DecimalInput> inputs = new ArrayList<>();
         DecimalInput magInput;
-        inputs.add(magInput = new DecimalInput("Magnitude", 0, 10, 4.0));
+        inputs.add(magInput = new DecimalInput(I18n.get("playground.input.magnitude"), 0, 10, 4.0));
         DecimalInput depthInput;
-        inputs.add(depthInput = new DecimalInput("Depth", 0, 700, 10.0));
-        new DecimalInputDialog(parent, "Choose parameters", inputs, () -> _createDebugEarthquake(
+        inputs.add(depthInput = new DecimalInput(I18n.get("playground.input.depth"), 0, 700, 10.0));
+        new DecimalInputDialog(parent, I18n.get("playground.chooseParameters"), inputs, () -> _createDebugEarthquake(
                 magInput.getValue(), depthInput.getValue(), getRenderer().getRenderProperties().centerLat, getRenderer().getRenderProperties().centerLon));
     }
 
@@ -549,7 +557,7 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
         String str = ((GlobalQuakePlayground) GlobalQuake.getInstance()).getWatermark();
         g.setColor(new Color(255, 100, 0, (int) ((1.0 + Math.sin(System.currentTimeMillis() / 300.0)) * 40.0 + 80)));
 
-        Font font = new Font("Calibri", Font.BOLD, 48);
+        Font font = GQFonts.font(Font.BOLD, 48);
         g.setFont(font);
 
         g.drawString(str, getWidth() / 2 - g.getFontMetrics().stringWidth(str) / 2, (getHeight() / 2 - 48 + font.getSize() / 4));
@@ -620,7 +628,7 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
 
                 str = getDescription(insertType);
                 g.setColor(Color.white);
-                font = new Font("Calibri", Font.BOLD, 32);
+                font = GQFonts.font(Font.BOLD, 32);
                 g.setFont(font);
                 g.drawString(str, getWidth() / 2 - g.getFontMetrics().stringWidth(str) / 2, (int) (getHeight() * 0.66 + font.getSize() / 4));
             }
@@ -633,17 +641,18 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
         g.fillRect(getWidth() - 30, 0, 30, 30);
         g.setColor(Color.white);
         g.drawRect(getWidth() - 30, 0, 30, 30);
-        g.setFont(new Font("Calibri", Font.BOLD, 18));
+        g.setFont(GQFonts.font(Font.BOLD, 18));
         g.setColor(Color.white);
         g.drawString(listHidden ? "<" : ">", getWidth() - 20, 21);
 
         if (insertType == InsertType.BRUSH_ADD || insertType == InsertType.BRUSH_DELETE) {
-            Font brushFont = new Font("Calibri", Font.BOLD, 28);
+            Font brushFont = GQFonts.font(Font.BOLD, 28);
             g.setFont(brushFont);
             g.setColor(insertType == InsertType.BRUSH_ADD ? new Color(0, 255, 100) : new Color(255, 80, 80));
-            String brushInfo = String.format("%s Mode | Radius: %.1f deg (~%.0f km) | [U/J] adjust radius | [B/D] switch mode | [ESC] clear",
-                    insertType == InsertType.BRUSH_ADD ? "Add" : "Delete",
-                    brushRadiusDegrees, brushRadiusDegrees * 111);
+            String brushInfo = I18n.format("playground.brush.info",
+                    I18n.get(insertType == InsertType.BRUSH_ADD ? "playground.brush.add" : "playground.brush.delete"),
+                    String.format(Locale.ENGLISH, "%.1f", brushRadiusDegrees),
+                    String.format(Locale.ENGLISH, "%.0f", brushRadiusDegrees * 111));
             int infoY = (int) (getHeight() * 0.66 + brushFont.getSize() / 4);
             g.drawString(brushInfo, getWidth() / 2 - g.getFontMetrics().stringWidth(brushInfo) / 2, infoY);
         }
@@ -651,10 +660,10 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
 
     private String getDescription(InsertType insertType) {
         return switch (insertType) {
-            case EARTHQUAKE -> "Press <space> to create Earthquake";
-            case RANDOM_STATIONS -> "Press <space> to add random stations";
-            case BRUSH_ADD -> "Click or drag to add stations";
-            case BRUSH_DELETE -> "Click or drag to delete stations";
+            case EARTHQUAKE -> I18n.get("playground.desc.earthquake");
+            case RANDOM_STATIONS -> I18n.get("playground.desc.randomStations");
+            case BRUSH_ADD -> I18n.get("playground.desc.brushAdd");
+            case BRUSH_DELETE -> I18n.get("playground.desc.brushDelete");
             default -> "";
         };
     }

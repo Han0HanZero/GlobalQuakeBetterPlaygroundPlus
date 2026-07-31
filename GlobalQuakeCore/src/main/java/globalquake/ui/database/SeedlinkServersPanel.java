@@ -1,5 +1,7 @@
 package globalquake.ui.database;
 
+import globalquake.core.GQFonts;
+
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.ui.action.seedlink.AddSeedlinkNetworkAction;
 import globalquake.ui.action.seedlink.EditSeedlinkNetworkAction;
@@ -79,7 +81,7 @@ public class SeedlinkServersPanel extends JPanel {
 
     private JTable createTable() {
         JTable table = new JTable(tableModel = new SeedlinkNetworksTableModel(manager.getStationDatabase().getSeedlinkNetworks()));
-        table.setFont(new Font("Arial", Font.PLAIN, 14));
+        table.setFont(GQFonts.font(Font.PLAIN, 14));
         table.setRowHeight(20);
         table.setGridColor(Color.black);
         table.setShowGrid(true);

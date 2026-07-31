@@ -2,6 +2,7 @@ package globalquake.ui.settings;
 
 import globalquake.core.Settings;
 import globalquake.core.training.EarthquakeAnalysisTraining;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -27,14 +28,10 @@ public class PerformanceSettingsPanel extends SettingsPanel {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createRaisedBevelBorder());
         panel.setLayout(new BorderLayout());
-        chkBoxParalell = new JCheckBox("Use all CPU cores");
+        chkBoxParalell = new JCheckBox(I18n.get("settings.performance.useAllCores"));
         chkBoxParalell.setSelected(Settings.parallelHypocenterLocations);
 
-        JTextArea textAreaExplanation = new JTextArea(
-                """
-                        Using all CPU cores will make the Hypocenter Finding much faster,\s
-                        but it will be using 100% of your CPU, which can increase lags.
-                        Make sure you select the optimal resolution above for your system.""");
+        JTextArea textAreaExplanation = new JTextArea(I18n.get("settings.performance.useAllCoresInfo"));
         textAreaExplanation.setBorder(new EmptyBorder(5, 5, 5, 5));
         textAreaExplanation.setEditable(false);
         textAreaExplanation.setBackground(panel.getBackground());
@@ -59,7 +56,7 @@ public class PerformanceSettingsPanel extends SettingsPanel {
         JLabel label = new JLabel();
         ChangeListener changeListener = changeEvent ->
         {
-            label.setText("Hypocenter Finding Resolution (CPU): %.2f ~ %s".formatted(
+            label.setText(I18n.format("settings.performance.resolution",
                     sliderResolution.getValue() / 100.0,
                     getNameForResolution(sliderResolution.getValue())));
             Settings.hypocenterDetectionResolution = (double) sliderResolution.getValue();
@@ -70,17 +67,11 @@ public class PerformanceSettingsPanel extends SettingsPanel {
         changeListener.stateChanged(null);
 
         JPanel panel = HypocenterAnalysisSettingsPanel.createCoolLayout(sliderResolution, label, "%.2f".formatted(Settings.hypocenterDetectionResolutionDefault / 100.0),
-                """
-                        By increasing the Hypocenter Finding Resolution, you can\s
-                        enhance the accuracy at which GlobalQuake locates hypocenters
-                        at the cost of increased demand on your CPU. If you experience
-                        significant lags while there is an earthquake happening on the map,
-                        you should decrease this value.
-                        """);
+                I18n.get("settings.performance.resolutionInfo"));
 
         JPanel panel2 = new JPanel();
 
-        JButton btnRecalibrate = new JButton("Recalibrate");
+        JButton btnRecalibrate = new JButton(I18n.get("settings.performance.recalibrate"));
         btnRecalibrate.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -96,20 +87,20 @@ public class PerformanceSettingsPanel extends SettingsPanel {
 
         panel2.add(btnRecalibrate);
 
-        JButton testSpeed = new JButton("Test Hypocenter Search");
+        JButton testSpeed = new JButton(I18n.get("settings.performance.testSearch"));
         testSpeed.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 testSpeed.setEnabled(false);
                 new Thread(() -> {
-                    testSpeed.setText("Test took %d ms".formatted(EarthquakeAnalysisTraining.measureTest(System.currentTimeMillis(), 60, true)));
+                    testSpeed.setText(I18n.format("settings.performance.testTook", EarthquakeAnalysisTraining.measureTest(System.currentTimeMillis(), 60, true)));
                     testSpeed.setEnabled(true);
                 }).start();
             }
         });
         panel2.add(testSpeed);
 
-        chkBoxRecalibrateOnLauch = new JCheckBox("Recalibrate on startup", Settings.recalibrateOnLaunch);
+        chkBoxRecalibrateOnLauch = new JCheckBox(I18n.get("settings.performance.recalibrateOnStartup"), Settings.recalibrateOnLaunch);
         panel2.add(chkBoxRecalibrateOnLauch);
 
         panel.add(panel2, BorderLayout.SOUTH);
@@ -117,14 +108,14 @@ public class PerformanceSettingsPanel extends SettingsPanel {
         return panel;
     }
 
-    public static final String[] RESOLUTION_NAMES = {"Very Low", "Low", "Default", "Increased", "High", "Very High", "Extremely High", "Insane"};
+    public static final String[] RESOLUTION_KEYS = {"resolutionVeryLow", "resolutionLow", "resolutionDefault", "resolutionIncreased", "resolutionHigh", "resolutionVeryHigh", "resolutionExtremelyHigh", "resolutionInsane"};
 
     private String getNameForResolution(int value) {
-        return RESOLUTION_NAMES[(int) Math.max(0, Math.min(RESOLUTION_NAMES.length - 1, ((value / 160.0) * (RESOLUTION_NAMES.length))))];
+        return I18n.get("settings.performance." + RESOLUTION_KEYS[(int) Math.max(0, Math.min(RESOLUTION_KEYS.length - 1, ((value / 160.0) * (RESOLUTION_KEYS.length))))]);
     }
 
     @Override
     public String getTitle() {
-        return "Performance";
+        return I18n.get("settings.performance.title");
     }
 }

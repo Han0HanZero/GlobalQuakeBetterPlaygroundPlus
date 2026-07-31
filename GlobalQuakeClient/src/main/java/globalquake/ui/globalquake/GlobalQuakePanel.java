@@ -1,5 +1,8 @@
 package globalquake.ui.globalquake;
 
+import globalquake.core.GQFonts;
+
+import globalquake.ui.i18n.I18n;
 import globalquake.alert.AlertManager;
 import globalquake.client.ClientSocket;
 import globalquake.client.ClientSocketStatus;
@@ -139,7 +142,7 @@ public class GlobalQuakePanel extends GlobePanel {
         if (clickedStations.size() == 1) {
             selectedStation = clickedStations.get(0);
         } else {
-            selectedStation = (AbstractStation) JOptionPane.showInputDialog(this, "Select station to open:", "Station selection",
+            selectedStation = (AbstractStation) JOptionPane.showInputDialog(this, I18n.get("panel.selectStationOpen"), I18n.get("panel.stationSelection"),
                     JOptionPane.PLAIN_MESSAGE, null, clickedStations.toArray(), clickedStations.get(0));
         }
 
@@ -188,7 +191,7 @@ public class GlobalQuakePanel extends GlobePanel {
     }
 
     private void drawCityIntensities(Graphics2D g) {
-        g.setFont(new Font("Calibri", Font.BOLD, 16));
+        g.setFont(GQFonts.font(Font.BOLD, 16));
 
         int cellHeight = (int) (g.getFont().getSize() * 1.2);
 
@@ -262,7 +265,7 @@ public class GlobalQuakePanel extends GlobePanel {
             g.setColor(Color.yellow);
             g.drawString(levelStr, getWidth() - levelW - 6, y);
 
-            String str = "Possibly felt by: ";
+            String str = I18n.get("panel.feltBy");
             g.setColor(Color.white);
             g.drawString(str, getWidth() - g.getFontMetrics().stringWidth(str) - levelW - 8, y);
             y += cellHeight;
@@ -276,7 +279,7 @@ public class GlobalQuakePanel extends GlobePanel {
             g.setColor(Color.orange);
             g.drawString(levelStr, getWidth() - levelW - 6, y);
 
-            String str = "Possibly heavily felt by: ";
+            String str = I18n.get("panel.heavilyFeltBy");
             g.setColor(Color.white);
             g.drawString(str, getWidth() - g.getFontMetrics().stringWidth(str) - levelW - 8, y);
         }
@@ -343,21 +346,21 @@ public class GlobalQuakePanel extends GlobePanel {
 
         String str;
 
-        g.setFont(new Font("Calibri", Font.BOLD, 16));
+        g.setFont(GQFonts.font(Font.BOLD, 16));
 
         height = 136;
         color = new Color(0, 90, 192);
-        g.setFont(new Font("Calibri", Font.BOLD, 22));
-        str = distGC <= 200 ? "Earthquake detected nearby!" : "Earthquake detected!";
+        g.setFont(GQFonts.font(Font.BOLD, 22));
+        str = distGC <= 200 ? I18n.get("panel.quakeNearby") : I18n.get("panel.quakeDetected");
 
         if (maxPGA >= IntensityScales.INTENSITY_SCALES[Settings.shakingLevelScale].getLevels().get(Settings.shakingLevelIndex).getPga()) {
             color = new Color(255, 200, 0);
-            str = "Shaking is expected!";
+            str = I18n.get("panel.shakingExpected");
         }
 
         if (maxPGA >= IntensityScales.INTENSITY_SCALES[Settings.strongShakingLevelScale].getLevels().get(Settings.strongShakingLevelIndex).getPga()) {
             color = new Color(200, 50, 0);
-            str = "Strong shaking is expected!";
+            str = I18n.get("panel.strongShakingExpected");
         }
 
         int y = getHeight() - height;
@@ -376,22 +379,22 @@ public class GlobalQuakePanel extends GlobePanel {
         Level level = IntensityScales.getIntensityScale().getLevel(maxPGA);
 
         drawIntensityBox(g, level, x + 4, y + 30, height - 34);
-        g.setFont(new Font("Calibri", Font.BOLD, 16));
+        g.setFont(GQFonts.font(Font.BOLD, 16));
         drawAccuracyBox(g, true, "", x + width + 2, y + 46, "%s".formatted(quake.magnitudeFormatted()), Scale.getColorEasily(quake.getMag() / 8.0));
 
         int intW = getIntensityBoxWidth(g);
         int _x = x + intW + 8;
 
         g.setColor(Color.white);
-        g.setFont(new Font("Calibri", Font.BOLD, 17));
+        g.setFont(GQFonts.font(Font.BOLD, 17));
 
-        str = "Distance: %s".formatted(Settings.getSelectedDistanceUnit().format(distGC, 1));
+        str = I18n.format("panel.distance", Settings.getSelectedDistanceUnit().format(distGC, 1));
         g.drawString(str, _x, y + 48);
-        str = "Depth: %s".formatted(Settings.getSelectedDistanceUnit().format(quake.getDepth(), 1));
+        str = I18n.format("panel.depth", Settings.getSelectedDistanceUnit().format(quake.getDepth(), 1));
         g.drawString(str, _x, y + 72);
 
-        drawAccuracyBox(g, false, "P Wave arrival: ", x + intW + 15, y + 96, "%ds".formatted(secondsP), secondsP == 0 ? Color.gray : new Color(0, 100, 220));
-        drawAccuracyBox(g, false, "S Wave arrival: ", x + intW + 15, y + 122, "%ds".formatted(secondsS), secondsS == 0 ? Color.gray : new Color(255, 50, 0));
+        drawAccuracyBox(g, false, I18n.get("panel.pWaveArrival"), x + intW + 15, y + 96, "%ds".formatted(secondsP), secondsP == 0 ? Color.gray : new Color(0, 100, 220));
+        drawAccuracyBox(g, false, I18n.get("panel.sWaveArrival"), x + intW + 15, y + 122, "%ds".formatted(secondsS), secondsS == 0 ? Color.gray : new Color(255, 50, 0));
 
         Path2D path = new Path2D.Double();
         int s = 70;
@@ -409,13 +412,13 @@ public class GlobalQuakePanel extends GlobePanel {
         g.draw(path);
 
         g.setColor(isDark(color) ? Color.white : Color.black);
-        g.setFont(new Font("Calibri", Font.BOLD, 36));
+        g.setFont(GQFonts.font(Font.BOLD, 36));
         g.drawString("!", x + width - s / 2 - g.getFontMetrics().stringWidth("!") / 2 - 6, y + height - 16);
     }
 
 
     private void drawTexts(Graphics2D g) {
-        g.setFont(new Font("Calibri", Font.BOLD, 24));
+        g.setFont(GQFonts.font(Font.BOLD, 24));
         g.setColor(Color.gray);
 
         if (Settings.displayTime) {
@@ -452,7 +455,7 @@ public class GlobalQuakePanel extends GlobePanel {
         List<SettingInfo> settingsStrings = createSettingInfos();
 
         int _y = getHeight() - 6;
-        g.setFont(new Font("Calibri", Font.PLAIN, 14));
+        g.setFont(GQFonts.font(Font.PLAIN, 14));
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         for (SettingInfo settingInfo : settingsStrings) {
@@ -473,18 +476,18 @@ public class GlobalQuakePanel extends GlobePanel {
     private List<SettingInfo> createSettingInfos() {
         List<SettingInfo> settingsStrings = new ArrayList<>();
 
-        settingsStrings.add(new SettingInfo("Old Earthquakes (E): ", Settings.displayArchivedQuakes ? "Shown" : "Hidden", Settings.displayArchivedQuakes ? Color.green : Color.red));
+        settingsStrings.add(new SettingInfo(I18n.get("panel.oldEarthquakes"), Settings.displayArchivedQuakes ? I18n.get("panel.shown") : I18n.get("panel.hidden"), Settings.displayArchivedQuakes ? Color.green : Color.red));
 
         //If sound is not available, set a special message
         if (!Sounds.soundsAvailable) {
-            settingsStrings.add(new SettingInfo("Sound Alarms: ", "Unavailable", Color.red));
+            settingsStrings.add(new SettingInfo(I18n.get("panel.soundAlarmsUnav"), I18n.get("panel.unavailable"), Color.red));
         } else {
-            settingsStrings.add(new SettingInfo("Sound Alarms (S): ", Settings.enableSound ? "Enabled" : "Disabled", Settings.enableSound ? Color.green : Color.red));
+            settingsStrings.add(new SettingInfo(I18n.get("panel.soundAlarms"), Settings.enableSound ? I18n.get("panel.enabled") : I18n.get("panel.disabled"), Settings.enableSound ? Color.green : Color.red));
         }
 
-        settingsStrings.add(new SettingInfo("Cinema Mode (C): ", isCinemaMode() ? "Enabled" : "Disabled", isCinemaMode() ? Color.green : Color.red));
+        settingsStrings.add(new SettingInfo(I18n.get("panel.cinemaMode"), isCinemaMode() ? I18n.get("panel.enabled") : I18n.get("panel.disabled"), isCinemaMode() ? Color.green : Color.red));
 
-        if (GlobalQuake.instance.getStationDatabaseManager() != null && GlobalQuake.instance.getStationDatabaseManager().getStationDatabase() != null) {
+        if (showStationsAndSeedlinks() && GlobalQuake.instance.getStationDatabaseManager() != null && GlobalQuake.instance.getStationDatabaseManager().getStationDatabase() != null) {
             int totalStations = 0;
             int connectedStations = 0;
             int runningSeedlinks = 0;
@@ -501,13 +504,13 @@ public class GlobalQuakePanel extends GlobePanel {
                 }
             }
 
-            settingsStrings.add(new SettingInfo("Stations: ", "%d / %d".formatted(connectedStations, totalStations), getColorPCT(1 - (double) connectedStations / totalStations)));
-            settingsStrings.add(new SettingInfo("Seedlinks: ", "%d / %d".formatted(runningSeedlinks, totalSeedlinks), getColorPCT(1 - (double) runningSeedlinks / totalSeedlinks)));
+            settingsStrings.add(new SettingInfo(I18n.get("panel.stations"), I18n.format("panel.pct", connectedStations, totalStations), getColorPCT(1 - (double) connectedStations / totalStations)));
+            settingsStrings.add(new SettingInfo(I18n.get("panel.seedlinks"), I18n.format("panel.pct", runningSeedlinks, totalSeedlinks), getColorPCT(1 - (double) runningSeedlinks / totalSeedlinks)));
         }
 
         if (GlobalQuake.instance instanceof GlobalQuakeClient clientGQ) {
             ClientSocket socket = clientGQ.getClientSocket();
-            settingsStrings.add(new SettingInfo("Server: ", "%s".formatted(socket.getStatus().getName()), socket.getStatus().getColor()));
+            settingsStrings.add(new SettingInfo(I18n.get("panel.server"), "%s".formatted(socket.getStatus().getName()), socket.getStatus().getColor()));
         }
 
         double GB = 1024 * 1024 * 1024.0;
@@ -517,9 +520,13 @@ public class GlobalQuakePanel extends GlobePanel {
 
         double pctUsed = usedMem / (double) maxMem;
 
-        settingsStrings.add(new SettingInfo("RAM: ", "%.2f / %.2fGB".formatted(usedMem / GB, maxMem / GB), getColorPCT(pctUsed)));
-        settingsStrings.add(new SettingInfo("FPS: ", "%d".formatted(getLastFPS()), getColorFPS(getLastFPS())));
+        settingsStrings.add(new SettingInfo(I18n.get("panel.ram"), I18n.format("panel.ramValue", usedMem / GB, maxMem / GB), getColorPCT(pctUsed)));
+        settingsStrings.add(new SettingInfo(I18n.get("panel.fps"), "%d".formatted(getLastFPS()), getColorFPS(getLastFPS())));
         return settingsStrings;
+    }
+
+    protected boolean showStationsAndSeedlinks() {
+        return true;
     }
 
     private Color getColorPCT(double pct) {
@@ -546,9 +553,9 @@ public class GlobalQuakePanel extends GlobePanel {
         List<Earthquake> quakes = GlobalQuake.instance.getEarthquakeAnalysis().getEarthquakes();
         int displayedQuake = quakes.isEmpty() ? -1 : (int) ((System.currentTimeMillis() / 5000) % (quakes.size()));
 
-        g.setFont(new Font("Arial", Font.BOLD, 16));
+        g.setFont(GQFonts.font(Font.BOLD, 16));
         g.setStroke(new BasicStroke(1f));
-        String string = "No Earthquakes Detected";
+        String string = I18n.get("panel.noQuakes");
 
         int baseWidth = g.getFontMetrics().stringWidth(string) + 12;
 
@@ -578,19 +585,21 @@ public class GlobalQuakePanel extends GlobePanel {
         Level level = shakeMap == null ? null : IntensityScales.getIntensityScale().getLevel(shakeMap.getMaxPGA());
         Color levelColor = level == null ? Color.gray : level.getColor();
 
-        Font regionFont = new Font("Calibri", Font.BOLD, 18);
-        Font quakeFont = new Font("Calibri", Font.BOLD, 22);
+        Font regionFont = GQFonts.font(Font.BOLD, 18);
+        Font quakeFont = GQFonts.font(Font.BOLD, 22);
 
         String quakeString = null;
 
         if (quake != null) {
-            quakeString = "%s Earthquake detected".formatted(quake.magnitudeFormatted());
+            quakeString = I18n.format("panel.quakeDetectedFmt", quake.magnitudeFormatted());
             xOffset = getIntensityBoxWidth(g) + 4;
             g.setFont(regionFont);
             baseWidth = Math.max(baseWidth + xOffset, g.getFontMetrics().stringWidth(quake.getRegion()) + xOffset + 10);
 
             g.setFont(quakeFont);
-            baseWidth = Math.max(baseWidth, g.getFontMetrics().stringWidth(quakeString) + 120);
+            // 以英文标题宽度为基准撑开框宽，避免中文标题更短导致整个框变窄、内部文字拥挤
+            String maxTitle = "M%.1f Earthquake detected".formatted(quake.getMag());
+            baseWidth = Math.max(baseWidth, g.getFontMetrics().stringWidth(maxTitle) + 120);
 
             g.setColor(levelColor);
         } else {
@@ -616,7 +625,7 @@ public class GlobalQuakePanel extends GlobePanel {
             if (cluster != null) {
                 Hypocenter hypocenter = cluster.getPreviousHypocenter();
                 if (hypocenter != null) {
-                    g.setFont(new Font("Calibri", Font.BOLD, 18));
+                    g.setFont(GQFonts.font(Font.BOLD, 18));
                     String str;
 
                     if (quakes.size() > 1) {
@@ -638,7 +647,7 @@ public class GlobalQuakePanel extends GlobePanel {
                     g.setColor(isDark(levelColor) ? Color.white : Color.black);
                     g.drawString(quakeString, x + 3, y + 21);
 
-                    String sim = GlobalQuake.instance.isSimulation() ? " (Simulated)":"";
+                    String sim = GlobalQuake.instance.isSimulation() ? I18n.get("panel.simulated"):"";
 
                     g.setColor(Color.white);
                     g.setFont(regionFont);
@@ -648,26 +657,26 @@ public class GlobalQuakePanel extends GlobePanel {
                     g.drawString("%s%s".formatted(Settings.formatDateTime(Instant.ofEpochMilli(quake.getOrigin())), sim), x + xOffset + 3, y + 66);
 
                     g.setColor(Color.white);
-                    g.setFont(new Font("Calibri", Font.BOLD, 16));
-                    g.drawString("lat: " + f4d.format(quake.getLat()) + " lon: " + f4d.format(quake.getLon()), x + xOffset + 3, y + 85);
-                    g.drawString("Depth: %s %s".formatted(
+                    g.setFont(GQFonts.font(Font.BOLD, 16));
+                    g.drawString(I18n.format("panel.latLon", f4d.format(quake.getLat()), f4d.format(quake.getLon())), x + xOffset + 3, y + 85);
+                    g.drawString(I18n.format("panel.depthFixed",
                                     Settings.getSelectedDistanceUnit().format(quake.getDepth(), 1),
-                                    hypocenter.depthFixed ? "(fixed)" : ""),
+                                    hypocenter.depthFixed ? I18n.get("panel.fixed") : ""),
                             x + xOffset + 3, y + 104);
-                    str = "Revision no. " + quake.getRevisionID();
+                    str = I18n.format("panel.revisionNo", quake.getRevisionID());
                     g.drawString(str, x + xOffset + 3, y + 123);
 
                     var obv = quake.getHypocenter().obviousArrivalsInfo;
 
                     if(Settings.displayAdditionalQuakeInfo && obv != null && obv.total() >= EarthquakeAnalysis.OBVIOUS_CORRECT_MIN_TOTAL) {
-                        str = "Obv: %.1f%%".formatted(obv.getPCT() * 100.0);
+                        str = I18n.format("panel.obv", obv.getPCT() * 100.0);
                         g.drawString(str, x + baseWidth - g.getFontMetrics().stringWidth(str) - 5, y + 104);
                     }
 
                     if (hypocenter.quality != null) {
                         QualityClass summaryQuality = hypocenter.quality.getSummary();
 
-                        drawAccuracyBox(g, true, "Quality: ", x + baseWidth + 2, y + 122, summaryQuality.toString(), summaryQuality.getColor());
+                        drawAccuracyBox(g, true, I18n.get("panel.quality"), x + baseWidth + 2, y + 122, summaryQuality.toString(), summaryQuality.getColor());
                     }
                 }
             }
@@ -694,9 +703,9 @@ public class GlobalQuakePanel extends GlobePanel {
         g.fillRect(x + 2, y + 2, width - 4, height - 4);
 
         g.setColor(Color.white);
-        g.setFont(new Font("Calibri", Font.BOLD, 15));
+        g.setFont(GQFonts.font(Font.BOLD, 15));
 
-        String str = "Stations: Total %d Used %d/%d Err %d".formatted(quake.getCluster().getPreviousHypocenter().totalEvents,
+        String str = I18n.format("panel.stationsTotal", quake.getCluster().getPreviousHypocenter().totalEvents,
                 quake.getCluster().getPreviousHypocenter().reducedEvents, quake.getCluster().getPreviousHypocenter().usedEvents,
                 quake.getCluster().getPreviousHypocenter().getWrongEventCount());
 
@@ -707,7 +716,7 @@ public class GlobalQuakePanel extends GlobePanel {
         double minDepth = quake.getCluster().getPreviousHypocenter().depthConfidenceInterval.minDepth();
         double maxDepth = quake.getCluster().getPreviousHypocenter().depthConfidenceInterval.maxDepth();
 
-        str = "Depth: %s (%s - %s)".formatted(units.format(quake.getDepth(), 1),
+        str = I18n.format("panel.depthRange", units.format(quake.getDepth(), 1),
                 units.format(minDepth, 1),
                 units.format(maxDepth, 1));
 
@@ -715,17 +724,17 @@ public class GlobalQuakePanel extends GlobePanel {
 
         Quality quality = quake.getCluster().getPreviousHypocenter().quality;
 
-        drawAccuracyBox(g, true, "Err. Depth ", (int) (x + width * 0.55), y + 56,
+        drawAccuracyBox(g, true, I18n.get("panel.errDepth"), (int) (x + width * 0.55), y + 56,
                 units.format(quality.getQualityDepth().getValue(), 1), quality.getQualityDepth().getQualityClass().getColor());
-        drawAccuracyBox(g, true, "Err. Origin ", (int) (x + width * 0.55), y + 80,
+        drawAccuracyBox(g, true, I18n.get("panel.errOrigin"), (int) (x + width * 0.55), y + 80,
                 "%.1fs".formatted(quality.getQualityOrigin().getValue()), quality.getQualityOrigin().getQualityClass().getColor());
-        drawAccuracyBox(g, true, "No. Stations ", (int) (x + width * 0.55), y + 104,
+        drawAccuracyBox(g, true, I18n.get("panel.noStations"), (int) (x + width * 0.55), y + 104,
                 "%.0f".formatted(quality.getQualityStations().getValue()), quality.getQualityStations().getQualityClass().getColor());
-        drawAccuracyBox(g, true, "Err. N-S ", x + width, y + 56,
+        drawAccuracyBox(g, true, I18n.get("panel.errNS"), x + width, y + 56,
                 units.format(quality.getQualityNS().getValue(), 1), quality.getQualityNS().getQualityClass().getColor());
-        drawAccuracyBox(g, true, "Err. E-W ", x + width, y + 80,
+        drawAccuracyBox(g, true, I18n.get("panel.errEW"), x + width, y + 80,
                 units.format(quality.getQualityEW().getValue(), 1), quality.getQualityEW().getQualityClass().getColor());
-        drawAccuracyBox(g, true, "Match ", x + width, y + 104,
+        drawAccuracyBox(g, true, I18n.get("panel.match"), x + width, y + 104,
                 "%.1f%%".formatted(quality.getQualityPercentage().getValue()), quality.getQualityPercentage().getQualityClass().getColor());
     }
 
@@ -762,11 +771,12 @@ public class GlobalQuakePanel extends GlobePanel {
         return !(darkness < 0.5);
     }
 
-    public static final String maxIntStr = "Max. Intensity";
-
     public static int getIntensityBoxWidth(Graphics2D g) {
-        g.setFont(new Font("Calibri", Font.BOLD, 10));
-        return g.getFontMetrics().stringWidth(maxIntStr) + 6;
+        g.setFont(GQFonts.font(Font.BOLD, 10));
+        // 以英文 "Max. Intensity" 宽度为下限，避免中文更短的标题把烈度框缩得过窄，
+        // 导致框内大号等级文字溢出与右侧文字重叠
+        int enWidth = g.getFontMetrics().stringWidth("Max. Intensity") + 6;
+        return Math.max(g.getFontMetrics().stringWidth(I18n.get("panel.maxIntensity")) + 6, enWidth);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -790,9 +800,10 @@ public class GlobalQuakePanel extends GlobePanel {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
         g.setColor(Color.white);
-        g.setFont(new Font("Calibri", Font.BOLD, 10));
-        g.drawString(maxIntStr, x + 2, y + 12);
-        String str1 = "Estimated";
+        g.setFont(GQFonts.font(Font.BOLD, 10));
+        String strMax = I18n.get("panel.maxIntensity");
+        g.drawString(strMax, x + (int) (width * 0.5 - 0.5 * g.getFontMetrics().stringWidth(strMax)), y + 12);
+        String str1 = I18n.get("panel.estimated");
         g.drawString(str1, x + (int) (width * 0.5 - 0.5 * g.getFontMetrics().stringWidth(str1)), y + 26);
 
         String str3 = "-";
@@ -801,7 +812,7 @@ public class GlobalQuakePanel extends GlobePanel {
         }
 
         g.setColor(Color.white);
-        g.setFont(new Font("Arial", Font.PLAIN, height / 2));
+        g.setFont(GQFonts.font(Font.PLAIN, height / 2));
         int x3 = x + (int) (width * 0.5 - 0.5 * g.getFontMetrics().stringWidth(str3));
 
         int w3 = g.getFontMetrics().stringWidth(str3);
@@ -809,12 +820,12 @@ public class GlobalQuakePanel extends GlobePanel {
 
         if (level != null && level.getSuffix() != null) {
             g.setColor(Color.white);
-            g.setFont(new Font("Arial", Font.PLAIN, 36));
+            g.setFont(GQFonts.font(Font.PLAIN, 36));
             g.drawString(level.getSuffix(), x3 + w3 / 2 + 12, y + 50);
         }
 
         g.setColor(Color.white);
-        g.setFont(new Font("Calibri", Font.BOLD, 11));
+        g.setFont(GQFonts.font(Font.BOLD, 11));
         String str = IntensityScales.getIntensityScale().getNameShort();
         g.drawString(str, x + (int) (width * 0.5 - 0.5 * g.getFontMetrics().stringWidth(str)), y + height - 4);
     }
@@ -822,8 +833,8 @@ public class GlobalQuakePanel extends GlobePanel {
     private static int drawMags(Graphics2D g, Earthquake quake, int y) {
         g.setStroke(new BasicStroke(1f));
 
-        String str = "Magnitude";
-        g.setFont(new Font("Calibri", Font.BOLD, 12));
+        String str = I18n.get("panel.magnitude");
+        g.setFont(GQFonts.font(Font.BOLD, 12));
 
         int startX = 16;
         int hh = 200;
@@ -842,7 +853,7 @@ public class GlobalQuakePanel extends GlobePanel {
         for (int mag = 1; mag <= 9; mag++) {
             double y0 = y + hh * (10 - mag) / 10.0;
             g.setColor(Color.white);
-            g.setFont(new Font("Calibri", Font.BOLD, 12));
+            g.setFont(GQFonts.font(Font.BOLD, 12));
             g.drawString(mag + "", startX - g.getFontMetrics().stringWidth(mag + "") - 5, (int) (y0 + 5));
             g.draw(new Line2D.Double(startX, y0, startX + 4, y0));
             g.draw(new Line2D.Double(startX + ww - 4, y0, startX + ww, y0));

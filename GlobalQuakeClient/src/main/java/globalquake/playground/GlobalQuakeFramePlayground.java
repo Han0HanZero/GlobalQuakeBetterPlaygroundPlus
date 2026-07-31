@@ -10,6 +10,7 @@ import globalquake.main.Main;
 import globalquake.ui.globalquake.EarthquakeListPanel;
 import globalquake.ui.globalquake.GlobalQuakeFrame;
 import globalquake.ui.globalquake.GlobalQuakePanel;
+import globalquake.ui.i18n.I18n;
 import org.tinylog.Logger;
 
 import javax.swing.*;
@@ -102,37 +103,37 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         JMenuBar menuBar = super.createJMenuBar();
 
         // File menu
-        JMenu fileMenu = new JMenu("File");
+        JMenu fileMenu = new JMenu(I18n.get("playground.menu.file"));
 
-        JMenuItem exportStationsItem = new JMenuItem("Export Stations...");
+        JMenuItem exportStationsItem = new JMenuItem(I18n.get("playground.menu.exportStations"));
         exportStationsItem.addActionListener(e -> showExportDialog());
         fileMenu.add(exportStationsItem);
 
         menuBar.add(fileMenu);
 
         // Playground menu
-        JMenu playgroundMenu = new JMenu("Playground");
+        JMenu playgroundMenu = new JMenu(I18n.get("playground.menu.playground"));
 
-        JMenuItem clearQuakesItem = new JMenuItem("Clear Earthquakes & Reset Waveforms");
+        JMenuItem clearQuakesItem = new JMenuItem(I18n.get("playground.menu.clearQuakes"));
         clearQuakesItem.addActionListener(e -> clearEarthquakesAndResetWaveforms());
         playgroundMenu.add(clearQuakesItem);
 
-        JMenuItem deleteStationsItem = new JMenuItem("Delete All Stations");
+        JMenuItem deleteStationsItem = new JMenuItem(I18n.get("playground.menu.deleteStations"));
         deleteStationsItem.addActionListener(e -> deleteAllStations());
         playgroundMenu.add(deleteStationsItem);
 
         playgroundMenu.addSeparator();
 
-        JMenuItem customQuakeItem = new JMenuItem("Custom Earthquake...");
+        JMenuItem customQuakeItem = new JMenuItem(I18n.get("playground.menu.customQuake"));
         customQuakeItem.addActionListener(e -> showCustomEarthquakeDialog());
         playgroundMenu.add(customQuakeItem);
 
         menuBar.add(playgroundMenu);
 
         // Help menu
-        JMenu helpMenu = new JMenu("Help");
+        JMenu helpMenu = new JMenu(I18n.get("playground.menu.help"));
 
-        JMenuItem keybindingsItem = new JMenuItem("Keybindings");
+        JMenuItem keybindingsItem = new JMenuItem(I18n.get("playground.menu.keybindings"));
         keybindingsItem.addActionListener(e -> showKeybindingsDialog());
         helpMenu.add(keybindingsItem);
 
@@ -148,14 +149,14 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         int stationCount = stationManager.getStations().size();
         if (stationCount == 0) {
             JOptionPane.showMessageDialog(this,
-                    "No stations to export!\n\nPlease add stations first using import or brush tools.",
-                    "Export Stations",
+                    I18n.get("playground.export.noStations"),
+                    I18n.get("playground.export.title"),
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         // Create dialog
-        JDialog exportDialog = new JDialog(this, "Export Stations", true);
+        JDialog exportDialog = new JDialog(this, I18n.get("playground.export.title"), true);
         exportDialog.setSize(450, 380);
         exportDialog.setLocationRelativeTo(this);
         exportDialog.setLayout(new BorderLayout(10, 10));
@@ -172,7 +173,7 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
-        formPanel.add(new JLabel("Dataset Name:"), gbc);
+        formPanel.add(new JLabel(I18n.get("playground.export.datasetName")), gbc);
 
         JTextField nameField = new JTextField(25);
         gbc.gridx = 1;
@@ -183,7 +184,7 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0.0;
-        formPanel.add(new JLabel("Author:"), gbc);
+        formPanel.add(new JLabel(I18n.get("playground.export.author")), gbc);
 
         JTextField authorField = new JTextField(25);
         gbc.gridx = 1;
@@ -195,7 +196,7 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         gbc.gridy = 2;
         gbc.weightx = 0.0;
         gbc.gridy = GridBagConstraints.NORTH;
-        formPanel.add(new JLabel("Description:"), gbc);
+        formPanel.add(new JLabel(I18n.get("playground.export.description")), gbc);
 
         JTextArea descArea = new JTextArea(5, 25);
         descArea.setLineWrap(true);
@@ -212,7 +213,7 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         gbc.gridwidth = 2;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        JLabel infoLabel = new JLabel("Stations to export: " + stationCount);
+        JLabel infoLabel = new JLabel(I18n.format("playground.export.stationCount", stationCount));
         infoLabel.setForeground(Color.GRAY);
         formPanel.add(infoLabel, gbc);
 
@@ -220,8 +221,8 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
 
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton exportBtn = new JButton("Export");
-        JButton cancelBtn = new JButton("Cancel");
+        JButton exportBtn = new JButton(I18n.get("playground.export.export"));
+        JButton cancelBtn = new JButton(I18n.get("common.cancel"));
         buttonPanel.add(exportBtn);
         buttonPanel.add(cancelBtn);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -235,8 +236,8 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
 
             if (name.isEmpty()) {
                 JOptionPane.showMessageDialog(exportDialog,
-                        "Please enter a dataset name!",
-                        "Warning",
+                        I18n.get("playground.export.needName"),
+                        I18n.get("common.warning"),
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -244,15 +245,15 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
             try {
                 exportStations(name, author, description, stationManager);
                 JOptionPane.showMessageDialog(exportDialog,
-                        "Successfully exported " + stationCount + " stations!",
-                        "Export Complete",
+                        I18n.format("playground.export.success", stationCount),
+                        I18n.get("playground.export.complete"),
                         JOptionPane.INFORMATION_MESSAGE);
                 exportDialog.dispose();
             } catch (Exception ex) {
                 Logger.error("Export failed", ex);
                 JOptionPane.showMessageDialog(exportDialog,
-                        "Export failed: " + ex.getMessage(),
-                        "Error",
+                        I18n.format("playground.export.failed", ex.getMessage()),
+                        I18n.get("common.error"),
                         JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -315,28 +316,27 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
     }
 
     private void showKeybindingsDialog() {
-        String message = "<html><b>Playground Mode Keybindings</b><br><br>" +
-                "<b>Station Operations:</b><br>" +
-                "[R] Random Stations (generates instantly)<br>" +
-                "[T] Import Stations (Dialog - select region & count)<br>" +
-                "[I] Import Stations (File Picker - load CSV directly)<br><br>" +
-                "<b>Brush Tools:</b><br>" +
-                "[B] Brush Add Mode - click/drag to add stations<br>" +
-                "[D] Brush Delete Mode - click/drag to delete stations<br>" +
-                "[U] Increase Brush Radius<br>" +
-                "[J] Decrease Brush Radius<br><br>" +
-                "<b>Earthquake Operations:</b><br>" +
-                "[E] Create Earthquake (press then Space to execute)<br>" +
-                "[F] Toggle Earthquake Display<br><br>" +
-                "<b>Time & View:</b><br>" +
-                "[Left/Right Arrow] Adjust Time (5 sec)<br>" +
-                "[Space] Execute Pending Action<br>" +
-                "[ESC] Clear All<br><br>" +
-                "<b>Sidebar:</b><br>" +
-                "Click the <b>></b> / <b><</b> button at the top-right corner<br>" +
-                "to show/hide the earthquake list sidebar.</html>";
+        String message = "<html><b>" + I18n.get("playground.keybindings.title") + "</b><br><br>" +
+                "<b>" + I18n.get("playground.keybindings.stationOps") + "</b><br>" +
+                "[R] " + I18n.get("playground.keybindings.r") + "<br>" +
+                "[T] " + I18n.get("playground.keybindings.t") + "<br>" +
+                "[I] " + I18n.get("playground.keybindings.i") + "<br><br>" +
+                "<b>" + I18n.get("playground.keybindings.brushTools") + "</b><br>" +
+                "[B] " + I18n.get("playground.keybindings.b") + "<br>" +
+                "[D] " + I18n.get("playground.keybindings.d") + "<br>" +
+                "[U] " + I18n.get("playground.keybindings.u") + "<br>" +
+                "[J] " + I18n.get("playground.keybindings.j") + "<br><br>" +
+                "<b>" + I18n.get("playground.keybindings.quakeOps") + "</b><br>" +
+                "[E] " + I18n.get("playground.keybindings.e") + "<br>" +
+                "[F] " + I18n.get("playground.keybindings.f") + "<br><br>" +
+                "<b>" + I18n.get("playground.keybindings.timeView") + "</b><br>" +
+                "[" + I18n.get("playground.keybindings.arrows") + "] " + I18n.get("playground.keybindings.arrowsDesc") + "<br>" +
+                "[Space] " + I18n.get("playground.keybindings.space") + "<br>" +
+                "[ESC] " + I18n.get("playground.keybindings.esc") + "<br><br>" +
+                "<b>" + I18n.get("playground.keybindings.sidebar") + "</b><br>" +
+                I18n.get("playground.keybindings.sidebarDesc") + "</html>";
 
-        JOptionPane.showMessageDialog(this, message, "Playground Keybindings",
+        JOptionPane.showMessageDialog(this, message, I18n.get("playground.keybindings.title"),
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -352,11 +352,8 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         int stationCount = stationManager.getStations().size();
 
         int confirm = JOptionPane.showConfirmDialog(this,
-                "Clear all simulated earthquakes and reset station waveforms?\n" +
-                        "Earthquakes: " + quakeCount + "\n" +
-                        "Stations: " + stationCount + " (kept, waveforms reset)\n\n" +
-                        "Station colors will return to blue.",
-                "Clear Earthquakes & Reset Waveforms",
+                I18n.format("playground.clearQuakes.confirm", quakeCount, stationCount),
+                I18n.get("playground.menu.clearQuakes"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
         if (confirm != JOptionPane.YES_OPTION) return;
@@ -395,16 +392,15 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         int stationCount = stationManager.getStations().size();
         if (stationCount == 0) {
             JOptionPane.showMessageDialog(this,
-                    "No stations to delete.",
-                    "Delete All Stations",
+                    I18n.get("playground.deleteStations.none"),
+                    I18n.get("playground.menu.deleteStations"),
                     JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
         int confirm = JOptionPane.showConfirmDialog(this,
-                "Delete all " + stationCount + " stations?\n" +
-                        "This cannot be undone.",
-                "Delete All Stations",
+                I18n.format("playground.deleteStations.confirm", stationCount),
+                I18n.get("playground.menu.deleteStations"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         if (confirm != JOptionPane.YES_OPTION) return;
@@ -438,11 +434,11 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         JTextField delayField = new JTextField("0", 10);
 
         String[][] fields = {
-                {"Magnitude (0-10):", "4.0"},
-                {"Latitude (-90 ~ 90):", String.format("%.4f", defaultLat)},
-                {"Longitude (-180 ~ 180):", String.format("%.4f", defaultLon)},
-                {"Depth (km, 0-700):", "10.0"},
-                {"Delay (sec, 0=now):", "0"}
+                {I18n.get("playground.custom.magnitude"), "4.0"},
+                {I18n.get("playground.custom.latitude"), String.format("%.4f", defaultLat)},
+                {I18n.get("playground.custom.longitude"), String.format("%.4f", defaultLon)},
+                {I18n.get("playground.custom.depth"), "10.0"},
+                {I18n.get("playground.custom.delay"), "0"}
         };
 
         for (int i = 0; i < fields.length; i++) {
@@ -461,7 +457,7 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         }
 
         int result = JOptionPane.showConfirmDialog(this, formPanel,
-                "Custom Earthquake Parameters",
+                I18n.get("playground.custom.title"),
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE);
 
@@ -477,29 +473,29 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
             delaySec = Integer.parseInt(delayField.getText().trim());
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this,
-                    "Invalid number format!\n" + e.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+                    I18n.format("playground.custom.invalidNumber", e.getMessage()),
+                    I18n.get("common.error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if (mag < 0 || mag > 10) {
-            JOptionPane.showMessageDialog(this, "Magnitude must be 0-10!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, I18n.get("playground.custom.magRange"), I18n.get("common.error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (lat < -90 || lat > 90) {
-            JOptionPane.showMessageDialog(this, "Latitude must be -90 ~ 90!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, I18n.get("playground.custom.latRange"), I18n.get("common.error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (lon < -180 || lon > 180) {
-            JOptionPane.showMessageDialog(this, "Longitude must be -180 ~ 180!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, I18n.get("playground.custom.lonRange"), I18n.get("common.error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (depth < 0 || depth > 700) {
-            JOptionPane.showMessageDialog(this, "Depth must be 0-700 km!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, I18n.get("playground.custom.depthRange"), I18n.get("common.error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (delaySec < 0) {
-            JOptionPane.showMessageDialog(this, "Delay must be >= 0!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, I18n.get("playground.custom.delayRange"), I18n.get("common.error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -509,9 +505,8 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
             ((GlobalQuakePanelPlayground) panel)._createDebugEarthquake(fMag, fDepth, fLat, fLon);
         } else {
             JOptionPane.showMessageDialog(this,
-                    "Earthquake will be created in " + delaySec + " seconds.\n" +
-                            "Mag " + fMag + " at (" + fLat + ", " + fLon + "), depth " + fDepth + " km",
-                    "Earthquake Scheduled",
+                    I18n.format("playground.custom.scheduled", delaySec, fMag, fLat, fLon, fDepth),
+                    I18n.get("playground.custom.scheduledTitle"),
                     JOptionPane.INFORMATION_MESSAGE);
             javax.swing.Timer timer = new javax.swing.Timer(delaySec * 1000, ev -> {
                 ((GlobalQuakePanelPlayground) panel)._createDebugEarthquake(fMag, fDepth, fLat, fLon);

@@ -6,20 +6,21 @@ import globalquake.ui.table.Column;
 import globalquake.ui.table.FilterableTableModel;
 import globalquake.ui.table.LastUpdateRenderer;
 import globalquake.ui.table.TableCellRendererAdapter;
+import globalquake.ui.i18n.I18n;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class EarthquakeTableModel extends FilterableTableModel<Earthquake> {
     private final List<Column<Earthquake, ?>> columns = List.of(
-            Column.readonly("Origin", LocalDateTime.class, Earthquake::getOriginDate, new LastUpdateRenderer<>()),
-            Column.readonly("Region", String.class, Earthquake::getRegion, new TableCellRendererAdapter<>()),
-            Column.readonly("Magnitude", Double.class, Earthquake::getMag, new TableCellRendererAdapter<>()),
-            Column.readonly("Depth", Double.class, Earthquake::getDepth, new TableCellRendererAdapter<>()),
-            Column.readonly("Lat", Double.class, Earthquake::getLat, new TableCellRendererAdapter<>()),
-            Column.readonly("Lon", Double.class, Earthquake::getLon, new TableCellRendererAdapter<>()),
-            Column.readonly("Quality", QualityClass.class, earthquake -> earthquake.getHypocenter().quality.getSummary(), new TableCellRendererAdapter<>()),
-            Column.readonly("Revision", Integer.class, Earthquake::getRevisionID, new TableCellRendererAdapter<>()));
+            Column.readonly(I18n.get("table.origin"), LocalDateTime.class, Earthquake::getOriginDate, new LastUpdateRenderer<>()),
+            Column.readonly(I18n.get("table.region"), String.class, Earthquake::getRegion, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.magnitude"), Double.class, Earthquake::getMag, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.depth"), Double.class, Earthquake::getDepth, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.lat"), Double.class, Earthquake::getLat, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.lon"), Double.class, Earthquake::getLon, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.quality"), QualityClass.class, earthquake -> earthquake.getHypocenter().quality.getSummary(), new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.revision"), Integer.class, Earthquake::getRevisionID, new TableCellRendererAdapter<>()));
 
 
     public EarthquakeTableModel(List<Earthquake> data) {

@@ -3,6 +3,7 @@ package globalquake.ui.stationselect;
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.ui.GQFrame;
 import globalquake.ui.StationCountPanel;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.stationselect.DragMode;
 import globalquake.ui.stationselect.StationSelectPanel;
 import globalquake.ui.stationselect.action.DeselectAllAction;
@@ -49,7 +50,7 @@ public class StationSelectFrame extends GQFrame implements ActionListener {
 
         togglePanel.add(toggleButton, gbc);
 
-        toggleButton.setToolTipText("Toggle Toolbar");
+        toggleButton.setToolTipText(I18n.get("stationselect.toggleToolbar"));
         toggleButton.setBackground(Color.GRAY);
 
         JPanel centerPanel = new JPanel(new GridBagLayout());
@@ -111,16 +112,16 @@ public class StationSelectFrame extends GQFrame implements ActionListener {
         pack();
         setLocationRelativeTo(parent);
         setResizable(true);
-        setTitle("Select Stations");
+        setTitle(I18n.get("stationselect.title"));
     }
 
     private JToolBar createToolbar() {
         JToolBar toolBar = new JToolBar("Tools", JToolBar.VERTICAL);
 
-        selectButton = new JToggleButton("Select Region");
-        selectButton.setToolTipText("Select All Available Stations in Region");
-        deselectButton = new JToggleButton("Deselect Region");
-        deselectButton.setToolTipText("Deselect All Available Stations in Region");
+        selectButton = new JToggleButton(I18n.get("stationselect.selectRegion"));
+        selectButton.setToolTipText(I18n.get("stationselect.selectRegionTip"));
+        deselectButton = new JToggleButton(I18n.get("stationselect.deselectRegion"));
+        deselectButton.setToolTipText(I18n.get("stationselect.deselectRegionTip"));
         selectButton.addActionListener(this);
         deselectButton.addActionListener(this);
 

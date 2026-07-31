@@ -1,5 +1,8 @@
 package globalquake.ui;
 
+import globalquake.core.GQFonts;
+
+import globalquake.ui.i18n.I18n;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
@@ -46,10 +49,10 @@ public class StationMonitorPanel extends JPanel {
 		g.fillRect(0, 0, w, h);
 
 		g.setColor(Color.black);
-		g.setFont(new Font("Calibri", Font.BOLD, 14));
-		g.drawString("Raw Data", 4, 14);
-		g.drawString("Band Pass %sHz - %sHz".formatted(BetterAnalysis.minFreqDefault, BetterAnalysis.maxFreqDefault), 4, (int) (h * HEIGHT_1 + 14));
-		g.drawString("Averages Ratio", 4, (int) (h * HEIGHT_2 + 14));
+		g.setFont(GQFonts.font(Font.BOLD, 14));
+		g.drawString(I18n.get("monitor.rawData"), 4, 14);
+		g.drawString(I18n.format("monitor.bandPass", BetterAnalysis.minFreqDefault, BetterAnalysis.maxFreqDefault), 4, (int) (h * HEIGHT_1 + 14));
+		g.drawString(I18n.get("monitor.averagesRatio"), 4, (int) (h * HEIGHT_2 + 14));
 
 		long upperMinute = (long) (Math.ceil(getTime()/ (1000 * 60.0) + 1) * (1000L * 60L));
 		for (int deltaSec = 0; deltaSec <= 60 * Settings.logsStoreTimeMinutes + 80; deltaSec += 10) {

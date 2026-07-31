@@ -2,6 +2,7 @@ package globalquake.ui.settings;
 
 import globalquake.core.Settings;
 import globalquake.core.report.EarthquakeReporter;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -17,11 +18,11 @@ public class DebugSettingsPanel extends SettingsPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(new EmptyBorder(5,5,5,5));
 
-        add(chkBoxReports = new JCheckBox("Enable Earthquake Reports", Settings.reportsEnabled));
-        add(new JLabel("     Reports will be stored in %s".formatted(EarthquakeReporter.ANALYSIS_FOLDER.getPath())));
-        add(chkBoxCoreWaves = new JCheckBox("Display PKP and PKIKP Waves", Settings.displayCoreWaves));
-        add(chkBoxConfidencePolygons = new JCheckBox("Display epicenter confidence polygons", Settings.confidencePolygons));
-        add(chkBoxRevisions = new JCheckBox("Reduce number of revisions", Settings.reduceRevisions));
+        add(chkBoxReports = new JCheckBox(I18n.get("settings.debug.enableReports"), Settings.reportsEnabled));
+        add(new JLabel(I18n.format("settings.debug.reportsLocation", EarthquakeReporter.ANALYSIS_FOLDER.getPath())));
+        add(chkBoxCoreWaves = new JCheckBox(I18n.get("settings.debug.displayCoreWaves"), Settings.displayCoreWaves));
+        add(chkBoxConfidencePolygons = new JCheckBox(I18n.get("settings.debug.confidencePolygons"), Settings.confidencePolygons));
+        add(chkBoxRevisions = new JCheckBox(I18n.get("settings.debug.reduceRevisions"), Settings.reduceRevisions));
     }
 
     @Override
@@ -34,6 +35,6 @@ public class DebugSettingsPanel extends SettingsPanel {
 
     @Override
     public String getTitle() {
-        return "Debug";
+        return I18n.get("settings.debug.title");
     }
 }

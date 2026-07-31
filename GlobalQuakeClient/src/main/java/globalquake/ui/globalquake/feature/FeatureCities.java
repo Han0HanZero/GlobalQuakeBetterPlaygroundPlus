@@ -1,5 +1,7 @@
 package globalquake.ui.globalquake.feature;
 
+import globalquake.core.GQFonts;
+
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
@@ -112,7 +114,7 @@ public class FeatureCities extends RenderFeature<CityLocation> {
 
                 String str = entity.getOriginal().name();
 
-                graphics.setFont(new Font("Calibri", Font.PLAIN, 14));
+                graphics.setFont(GQFonts.font(Font.PLAIN, 14));
                 graphics.drawString(str, (int) centerPonint.x - graphics.getFontMetrics().stringWidth(str) / 2, (int) centerPonint.y - 8);
             }
         }

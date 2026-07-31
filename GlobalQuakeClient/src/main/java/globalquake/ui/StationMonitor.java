@@ -1,5 +1,6 @@
 package globalquake.ui;
 
+import globalquake.ui.i18n.I18n;
 import globalquake.client.GlobalQuakeLocal;
 import globalquake.core.station.AbstractStation;
 import globalquake.core.station.GlobalStation;
@@ -35,8 +36,8 @@ public class StationMonitor extends GQFrame {
 
 		setLocationRelativeTo(parent);
 		setResizable(true);
-		setTitle("Station Monitor - " + station.getNetworkCode() + " " + station.getStationCode() + " "
-				+ station.getChannelName() + " " + station.getLocationCode());
+		setTitle(I18n.format("monitor.title", station.getNetworkCode() + " " + station.getStationCode() + " "
+				+ station.getChannelName() + " " + station.getLocationCode()));
 
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {

@@ -1,10 +1,13 @@
 package globalquake.ui.globalquake;
 
+import globalquake.core.GQFonts;
+
 import globalquake.core.GlobalQuake;
 import globalquake.main.Main;
 import globalquake.ui.GQFrame;
 import globalquake.ui.action.OpenURLAction;
 import globalquake.core.Settings;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.settings.SettingsFrame;
 
 import javax.swing.*;
@@ -34,7 +37,7 @@ public class GlobalQuakeFrame extends GQFrame {
 				g.fillRect(getWidth() - 20, 0, 20, 30);
 				g.setColor(Color.black);
 				g.drawRect(getWidth() - 20, 0, 20, 30);
-				g.setFont(new Font("Calibri", Font.BOLD, 16));
+				g.setFont(GQFonts.font(Font.BOLD, 16));
 				g.setColor(Color.black);
 				g.drawString(hideList ? "<" : ">", getWidth() - 16, 20);
 			}
@@ -112,9 +115,9 @@ public class GlobalQuakeFrame extends GQFrame {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBackground(Color.lightGray);
 
-		JMenu menuOptions = new JMenu("Options");
+		JMenu menuOptions = new JMenu(I18n.get("main.menu.options"));
 
-		JMenuItem settings = new JMenuItem("Settings");
+		JMenuItem settings = new JMenuItem(I18n.get("main.menu.settings"));
 		settings.addActionListener(new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
@@ -133,12 +136,12 @@ public class GlobalQuakeFrame extends GQFrame {
 
 		menuBar.add(menuOptions);
 
-		JMenu aboutMenu = new JMenu("Links");
+		JMenu aboutMenu = new JMenu(I18n.get("main.menu.links"));
 
-		aboutMenu.add(new OpenURLAction("https://github.com/xspanger3770/GlobalQuake/", "Open GitHub webpage"));
-		aboutMenu.add(new OpenURLAction("https://github.com/xspanger3770/GlobalQuake/issues/", "Report issue or request new feature"));
-		aboutMenu.add(new OpenURLAction("https://github.com/xspanger3770/GlobalQuake/releases/", "Check for latest version"));
-		aboutMenu.add(new OpenURLAction("https://www.buymeacoffee.com/jakubspangl/", "Donate"));
+		aboutMenu.add(new OpenURLAction("https://github.com/xspanger3770/GlobalQuake/", I18n.get("main.menu.github")));
+		aboutMenu.add(new OpenURLAction("https://github.com/xspanger3770/GlobalQuake/issues/", I18n.get("main.menu.report")));
+		aboutMenu.add(new OpenURLAction("https://github.com/xspanger3770/GlobalQuake/releases/", I18n.get("main.menu.latest")));
+		aboutMenu.add(new OpenURLAction("https://www.buymeacoffee.com/jakubspangl/", I18n.get("main.menu.donate")));
 
 		menuBar.add(aboutMenu);
 

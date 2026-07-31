@@ -3,6 +3,7 @@ package globalquake.ui.action.source;
 
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.core.database.StationSource;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.table.FilterableTableModel;
 
 import javax.swing.*;
@@ -21,11 +22,11 @@ public class RemoveStationSourceAction extends AbstractAction {
     private JTable table;
 
     public RemoveStationSourceAction(StationDatabaseManager databaseManager, Component parent){
-        super("Remove");
+        super(I18n.get("action.remove"));
         this.parent = parent;
         this.databaseManager = databaseManager;
 
-        putValue(SHORT_DESCRIPTION, "Remove Station Sources");
+        putValue(SHORT_DESCRIPTION, I18n.get("action.removeSourceTip"));
 
         ImageIcon removeIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image_icons/remove.png")));
         Image image = removeIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
@@ -44,8 +45,8 @@ public class RemoveStationSourceAction extends AbstractAction {
         }
 
         int option = JOptionPane.showConfirmDialog(parent,
-                "Are you sure you want to delete those items?",
-                "Confirmation",
+                I18n.get("action.deleteConfirm"),
+                I18n.get("action.confirmation"),
                 JOptionPane.YES_NO_OPTION);
 
         if (option != JOptionPane.YES_OPTION) {

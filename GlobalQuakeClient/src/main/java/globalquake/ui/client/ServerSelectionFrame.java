@@ -12,6 +12,7 @@ import globalquake.main.Main;
 import globalquake.core.regions.Regions;
 import globalquake.sounds.Sounds;
 import globalquake.ui.GQFrame;
+import globalquake.ui.i18n.I18n;
 import globalquake.utils.Scale;
 
 import javax.swing.*;
@@ -53,18 +54,18 @@ public class ServerSelectionFrame extends GQFrame {
         var grid=  new GridLayout(2,1);
         grid.setVgap(5);
         JPanel addressPanel = new JPanel(grid);
-        addressPanel.setBorder(BorderFactory.createTitledBorder("Server address"));
+        addressPanel.setBorder(BorderFactory.createTitledBorder(I18n.get("server.address")));
 
         JPanel ipPanel = new JPanel();
         ipPanel.setLayout(new BoxLayout(ipPanel, BoxLayout.X_AXIS));
-        ipPanel.add(new JLabel("IP Address: "));
+        ipPanel.add(new JLabel(I18n.get("server.ip")));
         ipPanel.add(addressField = new JTextField(Settings.lastServerIP,20));
 
         addressPanel.add(ipPanel);
 
         JPanel portPanel = new JPanel();
         portPanel.setLayout(new BoxLayout(portPanel, BoxLayout.X_AXIS));
-        portPanel.add(new JLabel("Port: "));
+        portPanel.add(new JLabel(I18n.get("server.port")));
         portPanel.add(portField = new JTextField(String.valueOf(Settings.lastServerPORT),20));
 
         addressPanel.add(portPanel);
@@ -78,11 +79,11 @@ public class ServerSelectionFrame extends GQFrame {
         JPanel buttonsPanel = new JPanel(gridl2);
         buttonsPanel.setBorder(new EmptyBorder(5,5,5,5));
 
-        connectButton = new JButton("Connect");
+        connectButton = new JButton(I18n.get("server.connect"));
         ActionListener connectEvent = actionEvent1 -> connect();
         connectButton.addActionListener(connectEvent);
 
-        JButton backButton = new JButton("Back");
+        JButton backButton = new JButton(I18n.get("server.back"));
         backButton.addActionListener(actionEvent -> {
             ServerSelectionFrame.this.dispose();
             new MainFrame().setVisible(true);
@@ -110,7 +111,7 @@ public class ServerSelectionFrame extends GQFrame {
             addressField.setEnabled(false);
             portField.setEnabled(false);
             connectButton.setEnabled(false);
-            connectButton.setText("Connecting...");
+            connectButton.setText(I18n.get("server.connecting"));
             try {
                 String ip = addressField.getText().trim();
                 int port = Integer.parseInt(portField.getText().trim());
@@ -127,8 +128,8 @@ public class ServerSelectionFrame extends GQFrame {
                 ServerSelectionFrame.this.dispose();
                 launchClientUI();
             } catch (Exception e) {
-                GlobalQuake.getErrorHandler().handleWarning(new RuntimeApplicationException("Failed to connect to the server: %s".formatted(e.getMessage()), e));
-                connectButton.setText("Connect");
+                GlobalQuake.getErrorHandler().handleWarning(new RuntimeApplicationException(I18n.format("server.connectFailed", e.getMessage()), e));
+                connectButton.setText(I18n.get("server.connect"));
             } finally {
                 addressField.setEnabled(true);
                 portField.setEnabled(true);

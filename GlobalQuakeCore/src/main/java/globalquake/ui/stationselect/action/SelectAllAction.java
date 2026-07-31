@@ -1,5 +1,6 @@
 package globalquake.ui.stationselect.action;
 
+import globalquake.ui.i18n.I18n;
 import globalquake.core.database.Network;
 import globalquake.core.database.Station;
 import globalquake.core.database.StationDatabaseManager;
@@ -31,8 +32,8 @@ public class SelectAllAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         int option = JOptionPane.showConfirmDialog(parent,
-                "Are you sure you want to select all stations?",
-                "Confirmation",
+                I18n.get("stationselect.selectAllConfirm"),
+                I18n.get("action.confirmation"),
                 JOptionPane.YES_NO_OPTION);
 
         if (option != JOptionPane.YES_OPTION) {

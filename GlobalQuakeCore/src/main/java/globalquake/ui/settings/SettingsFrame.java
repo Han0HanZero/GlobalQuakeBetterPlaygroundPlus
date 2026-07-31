@@ -6,6 +6,7 @@ import globalquake.core.exception.RuntimeApplicationException;
 import globalquake.core.geo.taup.TauPTravelTimeCalculator;
 import globalquake.sounds.Sounds;
 import globalquake.ui.GQFrame;
+import globalquake.ui.i18n.I18n;
 import org.tinylog.Logger;
 
 import javax.swing.*;
@@ -65,7 +66,7 @@ public class SettingsFrame extends GQFrame {
 
 
 	private void initialize(Component parent) {
-		setTitle(!isClient ? "GlobalQuake Settings" : "GlobalQuake Settings (Client)");
+		setTitle(!isClient ? I18n.get("settings.title") : I18n.get("settings.title.client"));
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		JPanel contentPanel = new JPanel(new BorderLayout());
@@ -77,12 +78,12 @@ public class SettingsFrame extends GQFrame {
 		JPanel panel_1 = new JPanel();
 		contentPanel.add(panel_1, BorderLayout.SOUTH);
 
-		JButton btnCancel = new JButton("Cancel");
+		JButton btnCancel = new JButton(I18n.get("common.cancel"));
 		panel_1.add(btnCancel);
 
 		btnCancel.addActionListener(e -> dispose());
 
-		JButton btnSave = new JButton("Save");
+		JButton btnSave = new JButton(I18n.get("common.save"));
 		panel_1.add(btnSave);
 
 		btnSave.addActionListener(e -> {
@@ -91,7 +92,7 @@ public class SettingsFrame extends GQFrame {
                     panel1.save();
                 }
 				catch(NumberFormatException exx){
-					GlobalQuake.getErrorHandler().handleWarning(new RuntimeApplicationException("Failed to parse a number: %s".formatted(exx.getMessage()), exx));
+					GlobalQuake.getErrorHandler().handleWarning(new RuntimeApplicationException(I18n.format("settings.error.parseNumber", exx.getMessage()), exx));
 					return;
 				} catch(RuntimeApplicationException exxx){
 					GlobalQuake.getErrorHandler().handleWarning(exxx);
@@ -140,5 +141,13 @@ public class SettingsFrame extends GQFrame {
 		for (SettingsPanel panel : panels) {
 			panel.refreshUI();
 		}
+	}
+
+	public void rebuildUI() {
+		tabbedPane.removeAll();
+		panels.clear();
+		addPanels();
+		setTitle(!isClient ? I18n.get("settings.title") : I18n.get("settings.title.client"));
+		pack();
 	}
 }

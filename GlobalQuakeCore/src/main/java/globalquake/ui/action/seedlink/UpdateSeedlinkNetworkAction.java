@@ -4,6 +4,7 @@ package globalquake.ui.action.seedlink;
 import globalquake.core.database.SeedlinkNetwork;
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.core.exception.RuntimeApplicationException;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.table.FilterableTableModel;
 
 import javax.swing.*;
@@ -22,10 +23,10 @@ public class UpdateSeedlinkNetworkAction extends AbstractAction {
     private JTable table;
 
     public UpdateSeedlinkNetworkAction(StationDatabaseManager databaseManager) {
-        super("Update");
+        super(I18n.get("action.update"));
         this.databaseManager = databaseManager;
 
-        putValue(SHORT_DESCRIPTION, "Update Seedlink Networks");
+        putValue(SHORT_DESCRIPTION, I18n.get("action.updateSeedlinkTip"));
 
         ImageIcon updateIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image_icons/update.png")));
         Image image = updateIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);

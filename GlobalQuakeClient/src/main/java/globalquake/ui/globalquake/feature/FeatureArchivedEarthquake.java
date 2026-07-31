@@ -1,5 +1,7 @@
 package globalquake.ui.globalquake.feature;
 
+import globalquake.core.GQFonts;
+
 import globalquake.core.GlobalQuake;
 import globalquake.core.archive.ArchivedQuake;
 import globalquake.ui.globe.GlobeRenderer;
@@ -106,7 +108,7 @@ public class FeatureArchivedEarthquake extends RenderFeature<ArchivedQuake> {
     }
 
     private void drawDetails(Graphics2D graphics, Point2D centerPonint, ArchivedQuake quake) {
-        graphics.setFont(new Font("Calibri", Font.PLAIN, 13));
+        graphics.setFont(GQFonts.font(Font.PLAIN, 13));
 
         double size = 3 + Math.pow(quake.getMag(), 2) * 0.6;
 

@@ -1,5 +1,6 @@
 package globalquake.core.database;
 
+import globalquake.ui.i18n.I18n;
 import javax.swing.*;
 import java.io.Serial;
 import java.io.Serializable;
@@ -66,7 +67,7 @@ public final class SeedlinkNetwork implements Serializable {
         if(statusBar == null){
             statusBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
             statusBar.setIndeterminate(false);
-            statusBar.setString("Ready");
+            statusBar.setString(I18n.get("source.status.ready"));
             statusBar.setValue(0);
             statusBar.setStringPainted(true);
         }

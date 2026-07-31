@@ -9,6 +9,7 @@ import globalquake.ui.stationselect.StationSelectFrame;
 import gqserver.main.Main;
 import globalquake.ui.GQFrame;
 import globalquake.ui.action.RestoreDatabaseAction;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.settings.SettingsFrame;
 
 import javax.swing.*;
@@ -96,11 +97,11 @@ public class DatabaseMonitorFrame extends GQFrame {
 
     private Component createTabbedPane() {
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Seedlink Networks", new SeedlinkServersPanel(
+        tabbedPane.addTab(I18n.get("db.tabSeedlink"), new SeedlinkServersPanel(
                 this, manager, restoreDatabaseAction, getBtnSelectStations(), new JButton()));
-        tabbedPane.addTab("FDSNWS", new StationSourcesPanel(
+        tabbedPane.addTab(I18n.get("db.tabSources"), new StationSourcesPanel(
                 this, manager, restoreDatabaseAction, getBtnSelectStations(), new JButton()));
-        tabbedPane.addTab("Server Status", new ServerStatusPanel());
+        tabbedPane.addTab(I18n.get("db.tabServerStatus"), new ServerStatusPanel());
         return tabbedPane;
     }
 
@@ -119,11 +120,11 @@ public class DatabaseMonitorFrame extends GQFrame {
         gridLayout.setHgap(5);
         buttonsPanel.setLayout(gridLayout);
 
-        JButton btnSettings = new JButton("Settings");
+        JButton btnSettings = new JButton(I18n.get("db.settings"));
         buttonsPanel.add(btnSettings);
         btnSettings.addActionListener(actionEvent -> new SettingsFrame(DatabaseMonitorFrame.this, false).setVisible(true));
 
-        btnSelectStations = new JButton("Select Stations");
+        btnSelectStations = new JButton(I18n.get("db.selectStations"));
         btnSelectStations.setEnabled(false);
 
         ImageIcon selectStationsIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image_icons/selectStations.png")));
@@ -144,7 +145,7 @@ public class DatabaseMonitorFrame extends GQFrame {
         mainProgressBar  = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
         mainProgressBar.setValue(0);
         mainProgressBar.setStringPainted(true);
-        mainProgressBar.setString("Init...");
+        mainProgressBar.setString(I18n.get("db.init"));
 
         buttonsOutsidePanel.add(buttonsPanel);
         buttonsOutsidePanel.add(mainProgressBar);

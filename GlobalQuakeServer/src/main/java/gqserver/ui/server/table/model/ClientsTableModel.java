@@ -1,5 +1,6 @@
 package gqserver.ui.server.table.model;
 
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.table.Column;
 import globalquake.ui.table.FilterableTableModel;
 import globalquake.ui.table.LastUpdateRenderer;
@@ -11,11 +12,11 @@ import java.util.List;
 
 public class ClientsTableModel extends FilterableTableModel<ServerClient> {
     private final List<Column<ServerClient, ?>> columns = List.of(
-            Column.readonly("ID", Integer.class, ServerClient::getID, new TableCellRendererAdapter<>()),
-            Column.readonly("Joined at", LocalDateTime.class, ServerClient::getJoinDate, new LastUpdateRenderer<>()),
-            Column.readonly("Delay (ms)", Long.class, ServerClient::getDelay, new TableCellRendererAdapter<>()),
-            Column.readonly("Packets sent", Long.class, ServerClient::getSentPackets, new TableCellRendererAdapter<>()),
-            Column.readonly("Packets received", Long.class, ServerClient::getReceivedPackets, new TableCellRendererAdapter<>()));
+            Column.readonly(I18n.get("table.id"), Integer.class, ServerClient::getID, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.joinedAt"), LocalDateTime.class, ServerClient::getJoinDate, new LastUpdateRenderer<>()),
+            Column.readonly(I18n.get("table.delayMs"), Long.class, ServerClient::getDelay, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.packetsSent"), Long.class, ServerClient::getSentPackets, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.packetsReceived"), Long.class, ServerClient::getReceivedPackets, new TableCellRendererAdapter<>()));
 
 
     public ClientsTableModel(List<ServerClient> data) {

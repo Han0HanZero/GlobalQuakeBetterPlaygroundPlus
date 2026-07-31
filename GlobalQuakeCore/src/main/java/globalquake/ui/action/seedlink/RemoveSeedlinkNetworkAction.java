@@ -3,6 +3,7 @@ package globalquake.ui.action.seedlink;
 
 import globalquake.core.database.SeedlinkNetwork;
 import globalquake.core.database.StationDatabaseManager;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.table.FilterableTableModel;
 
 import javax.swing.*;
@@ -20,11 +21,11 @@ public class RemoveSeedlinkNetworkAction extends AbstractAction {
     private JTable table;
 
     public RemoveSeedlinkNetworkAction(StationDatabaseManager databaseManager, Component parent){
-        super("Remove");
+        super(I18n.get("action.remove"));
         this.parent = parent;
         this.databaseManager = databaseManager;
 
-        putValue(SHORT_DESCRIPTION, "Remove Seedlink Network");
+        putValue(SHORT_DESCRIPTION, I18n.get("action.removeSeedlinkTip"));
 
         ImageIcon removeIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image_icons/remove.png")));
         Image image = removeIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
@@ -43,8 +44,8 @@ public class RemoveSeedlinkNetworkAction extends AbstractAction {
         }
 
         int option = JOptionPane.showConfirmDialog(parent,
-                "Are you sure you want to delete those items?",
-                "Confirmation",
+                I18n.get("action.deleteConfirm"),
+                I18n.get("action.confirmation"),
                 JOptionPane.YES_NO_OPTION);
 
         if (option != JOptionPane.YES_OPTION) {

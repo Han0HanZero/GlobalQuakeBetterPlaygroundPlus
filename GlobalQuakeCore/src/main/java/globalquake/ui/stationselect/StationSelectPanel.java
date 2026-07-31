@@ -1,5 +1,8 @@
 package globalquake.ui.stationselect;
 
+import globalquake.core.GQFonts;
+
+import globalquake.ui.i18n.I18n;
 import globalquake.core.database.Network;
 import globalquake.core.database.Station;
 import globalquake.core.database.StationDatabaseManager;
@@ -154,9 +157,9 @@ public class StationSelectPanel extends GlobePanel {
         }
 
         g.setColor(Color.orange);
-        g.setFont(new Font("Calibri", Font.BOLD, 18));
-        String str = stationSelectFrame.getDragMode() == DragMode.SELECT ? "Drag to select region"
-                : "Drag to deselect region";
+        g.setFont(GQFonts.font(Font.BOLD, 18));
+        String str = stationSelectFrame.getDragMode() == DragMode.SELECT ? I18n.get("stationselect.dragSelect")
+                : I18n.get("stationselect.dragDeselect");
         g.drawString(str, getWidth() / 2 - g.getFontMetrics().stringWidth(str) / 2, getHeight() - 8);
 
         if(dragRectangle != null){

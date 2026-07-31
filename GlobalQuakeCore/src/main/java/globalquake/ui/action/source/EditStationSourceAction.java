@@ -3,6 +3,7 @@ package globalquake.ui.action.source;
 import globalquake.core.database.StationDatabaseManager;
 import globalquake.core.database.StationSource;
 import globalquake.ui.dialog.EditStationSourceDialog;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.table.FilterableTableModel;
 
 import javax.swing.*;
@@ -19,11 +20,11 @@ public class EditStationSourceAction extends AbstractAction {
     private JTable table;
 
     public EditStationSourceAction(Window parent, StationDatabaseManager databaseManager){
-        super("Edit");
+        super(I18n.get("action.edit"));
         this.databaseManager = databaseManager;
         this.parent = parent;
 
-        putValue(SHORT_DESCRIPTION, "Edit Station Source");
+        putValue(SHORT_DESCRIPTION, I18n.get("action.editSourceTip"));
 
         ImageIcon editIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image_icons/edit.png")));
         Image image = editIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);

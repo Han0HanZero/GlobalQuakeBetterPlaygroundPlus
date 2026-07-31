@@ -1,5 +1,7 @@
 package globalquake.ui.archived;
 
+import globalquake.core.GQFonts;
+
 import globalquake.core.Settings;
 import globalquake.core.archive.ArchivedEvent;
 import globalquake.core.archive.ArchivedQuake;
@@ -117,7 +119,7 @@ public class ArchivedQuakePanel extends GlobePanel {
 
         Graphics2D g =(Graphics2D) gr;
         g.setColor(Color.white);
-        g.setFont(new Font("Calibri", Font.BOLD, 14));
+        g.setFont(GQFonts.font(Font.BOLD, 14));
 
         int y = 0;
         g.drawString("M%.1f %s".formatted(quake.getMag(), quake.getRegion()), 5, y+=15);
@@ -126,7 +128,7 @@ public class ArchivedQuakePanel extends GlobePanel {
         g.drawString("Depth: %s".formatted(Settings.getSelectedDistanceUnit().format(quake.getDepth(), 1)), 5, y+=15);
         g.drawString("%d Stations".formatted(quake.getAssignedStations()), 5, y+=15);
 
-        g.setFont(new Font("Calibri", Font.BOLD, 18));
+        g.setFont(GQFonts.font(Font.BOLD, 18));
         g.setColor(Color.orange);
         String str = "%s".formatted(Settings.formatDateTime(Instant.ofEpochMilli(animation.getCurrentTime())));
         g.drawString(str, getWidth() - g.getFontMetrics().stringWidth(str) - 3, getHeight() - 4);

@@ -1,5 +1,7 @@
 package gqserver.ui.server.table;
 
+import globalquake.core.GQFonts;
+
 
 import globalquake.ui.table.FilterableTableModel;
 
@@ -10,7 +12,7 @@ public class GQTable<E> extends JTable {
 
     public GQTable(FilterableTableModel<E> tableModel){
         super(tableModel);
-        setFont(new Font("Arial", Font.PLAIN, 14));
+        setFont(GQFonts.font(Font.PLAIN, 14));
         setRowHeight(20);
         setGridColor(Color.black);
         setShowGrid(true);

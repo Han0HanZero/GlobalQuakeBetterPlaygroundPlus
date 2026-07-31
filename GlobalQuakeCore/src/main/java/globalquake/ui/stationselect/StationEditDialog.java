@@ -1,7 +1,10 @@
 package globalquake.ui.stationselect;
 
+import globalquake.core.GQFonts;
+
 import globalquake.core.database.Channel;
 import globalquake.core.database.Station;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -12,7 +15,7 @@ public class StationEditDialog extends JDialog {
     public StationEditDialog(StationSelectFrame stationSelectFrame, Station selectedStation) {
         super(stationSelectFrame);
         setTitle(selectedStation.toString());
-        setFont(new Font("Calibri", Font.BOLD, 14));
+        setFont(GQFonts.font(Font.BOLD, 14));
 
         setResizable(false);
         setModal(true);
@@ -31,11 +34,11 @@ public class StationEditDialog extends JDialog {
 
         channelJComboBox.addItemListener(itemEvent -> selectedStation.setSelectedChannel((Channel) channelJComboBox.getSelectedItem()));
 
-        channelSelectPanel.add(new JLabel("Selected Channel:"));
+        channelSelectPanel.add(new JLabel(I18n.get("stationedit.selectedChannel")));
         channelSelectPanel.add(channelJComboBox);
         add(channelSelectPanel, BorderLayout.CENTER);
 
-        JButton doneButton = new JButton("Done");
+        JButton doneButton = new JButton(I18n.get("stationedit.done"));
         doneButton.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -56,13 +59,13 @@ public class StationEditDialog extends JDialog {
     private JTextArea createInfoTextArea(Station selectedStation) {
         JTextArea textAreaInfo = new JTextArea();
         textAreaInfo.setEditable(false);
-        textAreaInfo.append("Network Code: %s\n".formatted(selectedStation.getNetwork().getNetworkCode()));
-        textAreaInfo.append("Network Description:\n    %s\n".formatted(selectedStation.getNetwork().getDescription().trim()));
-        textAreaInfo.append("Station Code: %s\n".formatted(selectedStation.getStationCode()));
-        textAreaInfo.append("Station Site:\n    %s\n".formatted(selectedStation.getStationSite().trim()));
-        textAreaInfo.append("Elevation: %.1fm\n".formatted(selectedStation.getAlt()));
-        textAreaInfo.append("Latitude: %f\n".formatted(selectedStation.getLatitude()));
-        textAreaInfo.append("Longitude: %f\n".formatted(selectedStation.getLongitude()));
+        textAreaInfo.append(I18n.get("stationedit.networkCode").formatted(selectedStation.getNetwork().getNetworkCode()));
+        textAreaInfo.append(I18n.get("stationedit.networkDescription").formatted(selectedStation.getNetwork().getDescription().trim()));
+        textAreaInfo.append(I18n.get("stationedit.stationCode").formatted(selectedStation.getStationCode()));
+        textAreaInfo.append(I18n.get("stationedit.stationSite").formatted(selectedStation.getStationSite().trim()));
+        textAreaInfo.append(I18n.get("stationedit.elevation").formatted(selectedStation.getAlt()));
+        textAreaInfo.append(I18n.get("stationedit.latitude").formatted(selectedStation.getLatitude()));
+        textAreaInfo.append(I18n.get("stationedit.longitude").formatted(selectedStation.getLongitude()));
         textAreaInfo.setFont(getFont());
         textAreaInfo.setColumns(22);
         return textAreaInfo;

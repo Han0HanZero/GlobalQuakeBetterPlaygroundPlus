@@ -1,5 +1,7 @@
 package globalquake.core.exception.action;
 
+import globalquake.ui.i18n.I18n;
+
 import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -11,8 +13,8 @@ import javax.swing.SwingUtilities;
 public class IgnoreAction extends AbstractAction {
 
 	public IgnoreAction() {
-		super("Ignore");
-		putValue(SHORT_DESCRIPTION, "Ignore the error and continue (unsafe)");
+		super(I18n.get("error.actionIgnore"));
+		putValue(SHORT_DESCRIPTION, I18n.get("error.actionIgnoreDesc"));
         putValue(MNEMONIC_KEY, KeyEvent.VK_I);
 	}
 

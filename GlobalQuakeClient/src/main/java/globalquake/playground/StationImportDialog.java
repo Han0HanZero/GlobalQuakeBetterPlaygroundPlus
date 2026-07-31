@@ -1,6 +1,8 @@
 package globalquake.playground;
 
 import globalquake.core.GlobalQuake;
+import globalquake.core.GQFonts;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -19,7 +21,7 @@ public class StationImportDialog extends JDialog {
     private boolean clearExisting = true;
 
     public StationImportDialog(Frame parent, String stationFolderPath) {
-        super(parent, "Import Stations", true);
+        super(parent, I18n.get("stationimport.title"), true);
         this.stationFolders = CsvStationLoader.scanStationFolders(stationFolderPath);
         this.selectedNetworks = new HashSet<>();
         this.maxCount = 1000;
@@ -42,18 +44,18 @@ public class StationImportDialog extends JDialog {
 
         // Step 1 - Select station folder
         JPanel step1Panel = new JPanel(new BorderLayout(5, 5));
-        step1Panel.setBorder(BorderFactory.createTitledBorder("Step 1: Select Station Dataset"));
+        step1Panel.setBorder(BorderFactory.createTitledBorder(I18n.get("stationimport.step1")));
         step1Panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
         step1Panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         DefaultListModel<String> fileListModel = new DefaultListModel<>();
         for (CsvStationLoader.StationFolderInfo info : stationFolders) {
-            fileListModel.addElement(info.name() + " (" + info.stationCount() + " stations)");
+            fileListModel.addElement(info.name() + " (" + I18n.format("stationimport.stationsCount", info.stationCount()) + ")");
         }
 
         JList<String> fileList = new JList<>(fileListModel);
         fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        fileList.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        fileList.setFont(GQFonts.font(Font.PLAIN, 13));
         fileList.setSelectedIndex(0);
 
         JScrollPane fileScrollPane = new JScrollPane(fileList);
@@ -65,13 +67,13 @@ public class StationImportDialog extends JDialog {
 
         // Details panel
         JPanel detailsPanel = new JPanel(new BorderLayout(5, 5));
-        detailsPanel.setBorder(BorderFactory.createTitledBorder("Dataset Details"));
+        detailsPanel.setBorder(BorderFactory.createTitledBorder(I18n.get("stationimport.details")));
         detailsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
         detailsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JEditorPane detailsArea = new JEditorPane("text/html", "");
         detailsArea.setEditable(false);
-        detailsArea.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        detailsArea.setFont(GQFonts.font(Font.PLAIN, 12));
         detailsPanel.add(new JScrollPane(detailsArea), BorderLayout.CENTER);
 
         topPanel.add(detailsPanel);
@@ -80,7 +82,7 @@ public class StationImportDialog extends JDialog {
 
         // Middle: Step 2 - Select networks
         JPanel step2Panel = new JPanel(new BorderLayout(5, 5));
-        step2Panel.setBorder(BorderFactory.createTitledBorder("Step 2: Select Networks/Regions"));
+        step2Panel.setBorder(BorderFactory.createTitledBorder(I18n.get("stationimport.step2")));
 
         JPanel checkBoxPanel = new JPanel();
         checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
@@ -90,8 +92,8 @@ public class StationImportDialog extends JDialog {
         step2Panel.add(networkScrollPane, BorderLayout.CENTER);
 
         JPanel selectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton selectAllBtn = new JButton("Select All");
-        JButton deselectAllBtn = new JButton("Deselect All");
+        JButton selectAllBtn = new JButton(I18n.get("stationimport.selectAll"));
+        JButton deselectAllBtn = new JButton(I18n.get("stationimport.deselectAll"));
         step2Panel.add(selectPanel, BorderLayout.SOUTH);
         selectPanel.add(selectAllBtn);
         selectPanel.add(deselectAllBtn);
@@ -102,10 +104,10 @@ public class StationImportDialog extends JDialog {
         JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
 
         JPanel step3Panel = new JPanel(new BorderLayout(5, 5));
-        step3Panel.setBorder(BorderFactory.createTitledBorder("Step 3: Station Count Limit"));
+        step3Panel.setBorder(BorderFactory.createTitledBorder(I18n.get("stationimport.step3")));
 
-        JLabel countLabel = new JLabel("Max stations to import: 100");
-        countLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        JLabel countLabel = new JLabel(I18n.format("stationimport.maxStations", 100));
+        countLabel.setFont(GQFonts.font(Font.PLAIN, 12));
 
         JSlider slider = new JSlider(JSlider.HORIZONTAL, 1, 50000, 100);
         slider.setPaintTicks(false);
@@ -113,7 +115,7 @@ public class StationImportDialog extends JDialog {
 
         slider.addChangeListener(e -> {
             maxCount = slider.getValue();
-            countLabel.setText("Max stations to import: " + maxCount);
+            countLabel.setText(I18n.format("stationimport.maxStations", maxCount));
         });
 
         step3Panel.add(countLabel, BorderLayout.NORTH);
@@ -121,8 +123,8 @@ public class StationImportDialog extends JDialog {
 
         JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-        JCheckBox noLimitCheckBox = new JCheckBox("No limit (import all selected)", false);
-        JCheckBox clearExistingCheckBox = new JCheckBox("Clear existing stations before import", true);
+        JCheckBox noLimitCheckBox = new JCheckBox(I18n.get("stationimport.noLimit"), false);
+        JCheckBox clearExistingCheckBox = new JCheckBox(I18n.get("stationimport.clearExisting"), true);
         clearExistingCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
         noLimitCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
         optionsPanel.add(noLimitCheckBox);
@@ -135,8 +137,8 @@ public class StationImportDialog extends JDialog {
 
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton okBtn = new JButton("Import");
-        JButton cancelBtn = new JButton("Cancel");
+        JButton okBtn = new JButton(I18n.get("stationimport.import"));
+        JButton cancelBtn = new JButton(I18n.get("common.cancel"));
         buttonPanel.add(okBtn);
         buttonPanel.add(cancelBtn);
         bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -159,11 +161,11 @@ public class StationImportDialog extends JDialog {
             // Update details
             StringBuilder details = new StringBuilder();
             details.append("<html>");
-            details.append("<b>Name:</b> ").append(selectedFolder.name()).append("<br>");
-            details.append("<b>Author:</b> ").append(selectedFolder.author()).append("<br>");
-            details.append("<b>Total Stations:</b> ").append(selectedFolder.stationCount()).append("<br>");
+            details.append("<b>" + I18n.get("stationimport.detail.name") + ":</b> ").append(selectedFolder.name()).append("<br>");
+            details.append("<b>" + I18n.get("stationimport.detail.author") + ":</b> ").append(selectedFolder.author()).append("<br>");
+            details.append("<b>" + I18n.get("stationimport.detail.totalStations") + ":</b> ").append(selectedFolder.stationCount()).append("<br>");
             details.append("<br>");
-            details.append("<b>Description:</b><br>").append(selectedFolder.description());
+            details.append("<b>" + I18n.get("stationimport.detail.description") + ":</b><br>").append(selectedFolder.description());
             details.append("</html>");
             detailsArea.setText(details.toString());
             detailsArea.setCaretPosition(0);
@@ -189,7 +191,7 @@ public class StationImportDialog extends JDialog {
                 maxCount = stationCount;
                 slider.setValue(maxCount);
             }
-            countLabel.setText("Max stations to import: " + maxCount);
+            countLabel.setText(I18n.format("stationimport.maxStations", maxCount));
 
             checkBoxPanel.revalidate();
             checkBoxPanel.repaint();
@@ -221,10 +223,10 @@ public class StationImportDialog extends JDialog {
             noLimit = selected;
             slider.setEnabled(!selected);
             if (selected) {
-                countLabel.setText("Max stations to import: ALL");
+                countLabel.setText(I18n.get("stationimport.maxStationsAll"));
             } else {
                 maxCount = slider.getValue();
-                countLabel.setText("Max stations to import: " + maxCount);
+                countLabel.setText(I18n.format("stationimport.maxStations", maxCount));
             }
         });
 
@@ -238,8 +240,8 @@ public class StationImportDialog extends JDialog {
 
             if (selectedNetworks.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
-                        "Please select at least one network!",
-                        "Warning",
+                        I18n.get("stationimport.warnNoNetwork"),
+                        I18n.get("common.warning"),
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -277,11 +279,8 @@ public class StationImportDialog extends JDialog {
 
     private void showEmptyDialog(Frame parent) {
         JOptionPane.showMessageDialog(this,
-                "No station datasets found!\n\n" +
-                "Please create station folders in:\n" +
-                "  playground_stations/<dataset_name>/stations.csv\n" +
-                "  playground_stations/<dataset_name>/info.json",
-                "No Station Datasets",
+                I18n.get("stationimport.empty.message"),
+                I18n.get("stationimport.empty.title"),
                 JOptionPane.INFORMATION_MESSAGE);
         dispose();
     }

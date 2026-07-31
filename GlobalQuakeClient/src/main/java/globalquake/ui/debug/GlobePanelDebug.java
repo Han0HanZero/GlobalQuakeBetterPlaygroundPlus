@@ -1,5 +1,8 @@
 package globalquake.ui.debug;
 
+import globalquake.core.GQFonts;
+
+import globalquake.ui.i18n.I18n;
 import globalquake.core.GlobalQuake;
 import globalquake.core.archive.ArchivedQuake;
 import globalquake.core.earthquake.quality.QualityClass;
@@ -55,7 +58,7 @@ public class GlobePanelDebug extends GQFrame {
 				g.fillRect(getWidth() - 20, 0, 20, 30);
 				g.setColor(Color.black);
 				g.drawRect(getWidth() - 20, 0, 20, 30);
-				g.setFont(new Font("Calibri", Font.BOLD, 16));
+				g.setFont(GQFonts.font(Font.BOLD, 16));
 				g.setColor(Color.black);
 				g.drawString(hideList ? "<" : ">", getWidth() - 16, 20);
 				
@@ -63,7 +66,7 @@ public class GlobePanelDebug extends GQFrame {
 				g.fillRect(getWidth() - 20, getHeight() - 30, 20, 30);
 				g.setColor(Color.black);
 				g.drawRect(getWidth() - 20, getHeight() - 30, 20, 30);
-				g.setFont(new Font("Calibri", Font.BOLD, 16));
+				g.setFont(GQFonts.font(Font.BOLD, 16));
 				g.setColor(Color.black);
 				g.drawString("S", getWidth() - 15, getHeight() - 8);
 
@@ -156,7 +159,7 @@ public class GlobePanelDebug extends GQFrame {
 		pack();
 		setLocationRelativeTo(null);
 		setResizable(true);
-		setTitle("Globe Panel");
+		setTitle(I18n.get("globe.debug"));
 
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {

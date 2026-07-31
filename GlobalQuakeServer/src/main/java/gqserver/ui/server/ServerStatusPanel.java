@@ -2,6 +2,7 @@ package gqserver.ui.server;
 
 import globalquake.core.Settings;
 import globalquake.core.exception.RuntimeApplicationException;
+import globalquake.ui.i18n.I18n;
 import gqserver.events.GlobalQuakeServerEventListener;
 import gqserver.events.specific.ServerStatusChangedEvent;
 import gqserver.main.Main;
@@ -29,11 +30,11 @@ public class ServerStatusPanel extends JPanel {
     private Component createMiddlePanel() {
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        tabbedPane.addTab("Status", new StatusTab());
-        tabbedPane.addTab("Seedlinks", new SeedlinksTab());
-        tabbedPane.addTab("Clients", new ClientsTab());
-        tabbedPane.addTab("Earthquakes", new EarthquakesTab());
-        tabbedPane.addTab("Clusters", new ClustersTab());
+        tabbedPane.addTab(I18n.get("server.tab.status"), new StatusTab());
+        tabbedPane.addTab(I18n.get("server.tab.seedlinks"), new SeedlinksTab());
+        tabbedPane.addTab(I18n.get("server.tab.clients"), new ClientsTab());
+        tabbedPane.addTab(I18n.get("server.tab.earthquakes"), new EarthquakesTab());
+        tabbedPane.addTab(I18n.get("server.tab.clusters"), new ClustersTab());
 
         return tabbedPane;
     }
@@ -43,18 +44,18 @@ public class ServerStatusPanel extends JPanel {
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
 
         JPanel addressPanel = new JPanel(new GridLayout(2,1));
-        addressPanel.setBorder(BorderFactory.createTitledBorder("Server address"));
+        addressPanel.setBorder(BorderFactory.createTitledBorder(I18n.get("server.addressTitle")));
 
         JPanel ipPanel = new JPanel();
         ipPanel.setLayout(new BoxLayout(ipPanel, BoxLayout.X_AXIS));
-        ipPanel.add(new JLabel("IP Address: "));
+        ipPanel.add(new JLabel(I18n.get("server.ip")));
         ipPanel.add(addressField = new JTextField(Settings.lastServerIP,20));
 
         addressPanel.add(ipPanel);
 
         JPanel portPanel = new JPanel();
         portPanel.setLayout(new BoxLayout(portPanel, BoxLayout.X_AXIS));
-        portPanel.add(new JLabel("Port: "));
+        portPanel.add(new JLabel(I18n.get("server.port")));
         portPanel.add(portField = new JTextField(String.valueOf(Settings.lastServerPORT),20));
 
         addressPanel.add(portPanel);
@@ -62,10 +63,10 @@ public class ServerStatusPanel extends JPanel {
         topPanel.add(addressPanel);
 
         JPanel controlPanel = new JPanel(new GridLayout(2,1));
-        controlPanel.setBorder(BorderFactory.createTitledBorder("Control Panel"));
+        controlPanel.setBorder(BorderFactory.createTitledBorder(I18n.get("server.controlPanel")));
 
-        controlPanel.add(statusLabel = new JLabel("Status: Idle"));
-        controlPanel.add(controlButton = new JButton("Start Server"));
+        controlPanel.add(statusLabel = new JLabel(I18n.get("server.statusIdle")));
+        controlPanel.add(controlButton = new JButton(I18n.get("server.startServer")));
 
         GlobalQuakeServer.instance.getServerEventHandler().registerEventListener(new GlobalQuakeServerEventListener(){
             @Override
@@ -75,22 +76,22 @@ public class ServerStatusPanel extends JPanel {
                         addressField.setEnabled(true);
                         portField.setEnabled(true);
                         controlButton.setEnabled(true);
-                        controlButton.setText("Start Server");
+                        controlButton.setText(I18n.get("server.startServer"));
                     }
                     case OPENING -> {
                         addressField.setEnabled(false);
                         portField.setEnabled(false);
                         controlButton.setEnabled(false);
-                        controlButton.setText("Start Server");
+                        controlButton.setText(I18n.get("server.startServer"));
                     }
                     case RUNNING -> {
                         addressField.setEnabled(false);
                         portField.setEnabled(false);
                         controlButton.setEnabled(true);
-                        controlButton.setText("Stop Server");
+                        controlButton.setText(I18n.get("server.stopServer"));
                     }
                 }
-                statusLabel.setText("Status: %s".formatted(event.status()));
+                statusLabel.setText(I18n.format("server.status", event.status()));
             }
         });
 
@@ -109,16 +110,16 @@ public class ServerStatusPanel extends JPanel {
                     GlobalQuakeServer.instance.getServerSocket().run(ip, port);
                     GlobalQuakeServer.instance.startRuntime();
                 } catch(Exception e){
-                    Main.getErrorHandler().handleException(new RuntimeApplicationException("Failed to start server", e));
+                    Main.getErrorHandler().handleException(new RuntimeApplicationException(I18n.get("server.startFailed"), e));
                 }
             } else if(status == SocketStatus.RUNNING) {
-                if(confirm("Are you sure you want to close the server?")) {
+                if(confirm(I18n.get("server.closeConfirm"))) {
                     try {
                         GlobalQuakeServer.instance.getServerSocket().stop();
                         GlobalQuakeServer.instance.stopRuntime();
                         GlobalQuakeServer.instance.reset();
                     } catch (IOException e) {
-                        Main.getErrorHandler().handleException(new RuntimeApplicationException("Failed to stop server", e));
+                        Main.getErrorHandler().handleException(new RuntimeApplicationException(I18n.get("server.stopFailed"), e));
                     }
                 }
             }
@@ -130,7 +131,7 @@ public class ServerStatusPanel extends JPanel {
 
     @SuppressWarnings("SameParameterValue")
     private boolean confirm(String s) {
-        return JOptionPane.showConfirmDialog(this, s, "Confirmation", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+        return JOptionPane.showConfirmDialog(this, s, I18n.get("server.confirmation"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
 
 }

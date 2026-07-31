@@ -2,6 +2,7 @@ package globalquake.ui.settings;
 
 import globalquake.core.Settings;
 import globalquake.core.earthquake.quality.QualityClass;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -63,10 +64,10 @@ public class GraphicsSettingsPanel extends SettingsPanel{
 
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        tabbedPane.addTab("General", createGeneralTab());
-        tabbedPane.addTab("Old Events", createEventsTab());
-        tabbedPane.addTab("Stations", createStationsTab());
-        tabbedPane.addTab("Cinema Mode", createCinemaModeTab());
+        tabbedPane.addTab(I18n.get("settings.graphics.tabGeneral"), createGeneralTab());
+        tabbedPane.addTab(I18n.get("settings.graphics.tabOldEvents"), createEventsTab());
+        tabbedPane.addTab(I18n.get("settings.graphics.tabStations"), createStationsTab());
+        tabbedPane.addTab(I18n.get("settings.graphics.tabCinemaMode"), createCinemaModeTab());
 
         add(tabbedPane, BorderLayout.CENTER);
     }
@@ -80,7 +81,7 @@ public class GraphicsSettingsPanel extends SettingsPanel{
 
         JPanel timePanel = new JPanel();
         timePanel.setLayout(new BoxLayout(timePanel, BoxLayout.X_AXIS));
-        timePanel.add(new JLabel("Switch to another point of interest after (seconds): "));
+        timePanel.add(new JLabel(I18n.get("settings.graphics.cinemaSwitchTime")));
         timePanel.add(textFieldTime);
         panel.add(timePanel);
 
@@ -88,7 +89,7 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         zoomPanel.setBorder(new EmptyBorder(5,5,5,5));
 
         zoomPanel.setLayout(new BoxLayout(zoomPanel, BoxLayout.X_AXIS));
-        zoomPanel.add(new JLabel("Zoom multiplier (move right to zoom in):"));
+        zoomPanel.add(new JLabel(I18n.get("settings.graphics.cinemaZoomMul")));
 
         sliderZoomMul = new JSlider(JSlider.HORIZONTAL, 20,500, Settings.cinemaModeZoomMultiplier);
         sliderZoomMul.setMinorTickSpacing(10);
@@ -100,8 +101,8 @@ public class GraphicsSettingsPanel extends SettingsPanel{
 
         JPanel checkboxPanel = new JPanel();
 
-        checkboxPanel.add(chkBoxEnableOnStartup = new JCheckBox("Enable Cinema Mode on startup", Settings.cinemaModeOnStartup));
-        checkboxPanel.add(chkBoxReEnable = new JCheckBox("Re-enable Cinema Mode automatically", Settings.cinemaModeReenable));
+        checkboxPanel.add(chkBoxEnableOnStartup = new JCheckBox(I18n.get("settings.graphics.cinemaOnStartup"), Settings.cinemaModeOnStartup));
+        checkboxPanel.add(chkBoxReEnable = new JCheckBox(I18n.get("settings.graphics.cinemaReenable"), Settings.cinemaModeReenable));
         panel.add(checkboxPanel);
 
         fill(panel, 32);
@@ -115,7 +116,7 @@ public class GraphicsSettingsPanel extends SettingsPanel{
 
         JPanel performancePanel = new JPanel();
         performancePanel.setLayout(new BoxLayout(performancePanel, BoxLayout.Y_AXIS));
-        performancePanel.setBorder(BorderFactory.createTitledBorder("Performance"));
+        performancePanel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.graphics.performance")));
 
         sliderFpsIdle = new JSlider(JSlider.HORIZONTAL, 10, 200, Settings.fpsIdle);
         sliderFpsIdle.setPaintLabels(true);
@@ -124,9 +125,9 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         sliderFpsIdle.setMinorTickSpacing(5);
         sliderFpsIdle.setBorder(new EmptyBorder(5,5,10,5));
 
-        JLabel label = new JLabel("FPS limit: "+sliderFpsIdle.getValue());
+        JLabel label = new JLabel(I18n.format("settings.graphics.fpsLimit", sliderFpsIdle.getValue()));
 
-        sliderFpsIdle.addChangeListener(changeEvent -> label.setText("FPS limit: "+sliderFpsIdle.getValue()));
+        sliderFpsIdle.addChangeListener(changeEvent -> label.setText(I18n.format("settings.graphics.fpsLimit", sliderFpsIdle.getValue())));
 
         performancePanel.add(label);
         performancePanel.add(sliderFpsIdle);
@@ -134,7 +135,7 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         panel.add(performancePanel);
 
         JPanel dateFormatPanel = new JPanel();
-        dateFormatPanel.setBorder(BorderFactory.createTitledBorder("Date and Time setting"));
+        dateFormatPanel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.graphics.dateTime")));
 
         comboBoxDateFormat = new JComboBox<>();
         Instant now = Instant.now();
@@ -144,41 +145,41 @@ public class GraphicsSettingsPanel extends SettingsPanel{
 
         comboBoxDateFormat.setSelectedIndex(Settings.selectedDateFormatIndex);
 
-        dateFormatPanel.add(new JLabel("Preferred date format: "));
+        dateFormatPanel.add(new JLabel(I18n.get("settings.graphics.dateFormat")));
         dateFormatPanel.add(comboBoxDateFormat);
-        dateFormatPanel.add(chkBox24H = new JCheckBox("Use 24 hours format", Settings.use24HFormat));
+        dateFormatPanel.add(chkBox24H = new JCheckBox(I18n.get("settings.graphics.use24h"), Settings.use24HFormat));
 
         panel.add(dateFormatPanel);
 
         JPanel mainWindowPanel = new JPanel(new GridLayout(4,2));
-        mainWindowPanel.setBorder(new TitledBorder("Main Screen"));
+        mainWindowPanel.setBorder(new TitledBorder(I18n.get("settings.graphics.mainScreen")));
 
-        mainWindowPanel.add(chkBoxDisplaySystemInfo = new JCheckBox("Display system info", Settings.displaySystemInfo));
-        mainWindowPanel.add(chkBoxDisplayMagnitudeHistogram = new JCheckBox("Display magnitude histogram", Settings.displayMagnitudeHistogram));
-        mainWindowPanel.add(chkBoxDisplayQuakeAdditionalInfo = new JCheckBox("Display technical earthquake data", Settings.displayAdditionalQuakeInfo));
-        mainWindowPanel.add(chkBoxAlertBox = new JCheckBox("Display alert box for nearby earthquakes", Settings.displayAlertBox));
-        mainWindowPanel.add(chkBoxShakemap = new JCheckBox("Display shakemap hexagons", Settings.displayShakemaps));
-        mainWindowPanel.add(chkBoxTime = new JCheckBox("Display time", Settings.displayTime));
-        mainWindowPanel.add(chkBoxCityIntensities = new JCheckBox("Display estimated intensities in cities", Settings.displayCityIntensities));
-        mainWindowPanel.add(chkBoxCapitals = new JCheckBox("Display capital cities", Settings.displayCapitalCities));
+        mainWindowPanel.add(chkBoxDisplaySystemInfo = new JCheckBox(I18n.get("settings.graphics.displaySystemInfo"), Settings.displaySystemInfo));
+        mainWindowPanel.add(chkBoxDisplayMagnitudeHistogram = new JCheckBox(I18n.get("settings.graphics.displayMagHistogram"), Settings.displayMagnitudeHistogram));
+        mainWindowPanel.add(chkBoxDisplayQuakeAdditionalInfo = new JCheckBox(I18n.get("settings.graphics.displayQuakeTechData"), Settings.displayAdditionalQuakeInfo));
+        mainWindowPanel.add(chkBoxAlertBox = new JCheckBox(I18n.get("settings.graphics.displayAlertBox"), Settings.displayAlertBox));
+        mainWindowPanel.add(chkBoxShakemap = new JCheckBox(I18n.get("settings.graphics.displayShakemap"), Settings.displayShakemaps));
+        mainWindowPanel.add(chkBoxTime = new JCheckBox(I18n.get("settings.graphics.displayTime"), Settings.displayTime));
+        mainWindowPanel.add(chkBoxCityIntensities = new JCheckBox(I18n.get("settings.graphics.displayCityIntensities"), Settings.displayCityIntensities));
+        mainWindowPanel.add(chkBoxCapitals = new JCheckBox(I18n.get("settings.graphics.displayCapitals"), Settings.displayCapitalCities));
 
         panel.add(mainWindowPanel);
 
         JPanel clustersPanel = new JPanel(new GridLayout(3,1));
-        clustersPanel.setBorder(new TitledBorder("Cluster settings"));
+        clustersPanel.setBorder(new TitledBorder(I18n.get("settings.graphics.clusterSettings")));
 
-        clustersPanel.add(chkBoxClusterRoots = new JCheckBox("Display Clusters (possible shaking locations)", Settings.displayClusterRoots));
-        clustersPanel.add(chkBoxClusters = new JCheckBox("Display Stations assigned to Clusters (local mode only)", Settings.displayClusters));
-        clustersPanel.add(chkBoxHideClusters = new JCheckBox("Hide Cluster after the Earthquake is actually found", Settings.hideClustersWithQuake));
+        clustersPanel.add(chkBoxClusterRoots = new JCheckBox(I18n.get("settings.graphics.displayClustersRoots"), Settings.displayClusterRoots));
+        clustersPanel.add(chkBoxClusters = new JCheckBox(I18n.get("settings.graphics.displayClusterStations"), Settings.displayClusters));
+        clustersPanel.add(chkBoxHideClusters = new JCheckBox(I18n.get("settings.graphics.hideClusters"), Settings.hideClustersWithQuake));
 
         panel.add(clustersPanel);
 
         JPanel antialiasPanel = new JPanel(new GridLayout(3,1));
-        antialiasPanel.setBorder(new TitledBorder("Antialiasing"));
-        antialiasPanel.add(chkBoxAntialiasStations = new JCheckBox("Stations", Settings.antialiasing));
-        antialiasPanel.add(chkBoxAntialiasClusters = new JCheckBox("Clusters", Settings.antialiasingClusters));
-        antialiasPanel.add(chkBoxAntialiasQuakes = new JCheckBox("Earthquakes", Settings.antialiasingQuakes));
-        antialiasPanel.add(chkBoxAntialiasOldQuakes = new JCheckBox("Archived Earthquakes", Settings.antialiasingOldQuakes));
+        antialiasPanel.setBorder(new TitledBorder(I18n.get("settings.graphics.antialiasing")));
+        antialiasPanel.add(chkBoxAntialiasStations = new JCheckBox(I18n.get("settings.graphics.aaStations"), Settings.antialiasing));
+        antialiasPanel.add(chkBoxAntialiasClusters = new JCheckBox(I18n.get("settings.graphics.aaClusters"), Settings.antialiasingClusters));
+        antialiasPanel.add(chkBoxAntialiasQuakes = new JCheckBox(I18n.get("settings.graphics.aaEarthquakes"), Settings.antialiasingQuakes));
+        antialiasPanel.add(chkBoxAntialiasOldQuakes = new JCheckBox(I18n.get("settings.graphics.aaArchived"), Settings.antialiasingOldQuakes));
 
         panel.add(antialiasPanel);
 
@@ -187,14 +188,14 @@ public class GraphicsSettingsPanel extends SettingsPanel{
 
     private Component createEventsTab() {
         JPanel eventsPanel = new JPanel();
-        eventsPanel.setBorder(BorderFactory.createTitledBorder("Old events settings"));
+        eventsPanel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.graphics.oldEvents")));
         eventsPanel.setLayout(new BoxLayout(eventsPanel, BoxLayout.Y_AXIS));
 
         JPanel timePanel = new JPanel();
         timePanel.setLayout(new BoxLayout(timePanel, BoxLayout.X_AXIS));
         timePanel.setBorder(new EmptyBorder(5,5,5,5));
 
-        chkBoxEnableTimeFilter = new JCheckBox("Don't display older than (hours): ");
+        chkBoxEnableTimeFilter = new JCheckBox(I18n.get("settings.graphics.hideOlderThanHours"));
         chkBoxEnableTimeFilter.setSelected(Settings.oldEventsTimeFilterEnabled);
 
         textFieldTimeFilter = new JTextField(Settings.oldEventsTimeFilter.toString(), 12);
@@ -211,7 +212,7 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         magnitudePanel.setBorder(new EmptyBorder(5,5,5,5));
         magnitudePanel.setLayout(new BoxLayout(magnitudePanel, BoxLayout.X_AXIS));
 
-        chkBoxEnableMagnitudeFilter = new JCheckBox("Don't display smaller than (magnitude): ");
+        chkBoxEnableMagnitudeFilter = new JCheckBox(I18n.get("settings.graphics.hideSmallerThanMag"));
         chkBoxEnableMagnitudeFilter.setSelected(Settings.oldEventsMagnitudeFilterEnabled);
 
         textFieldMagnitudeFilter = new JTextField(Settings.oldEventsMagnitudeFilter.toString(), 12);
@@ -230,7 +231,7 @@ public class GraphicsSettingsPanel extends SettingsPanel{
 
         textFieldMaxArchived = new JTextField(Settings.maxArchivedQuakes.toString(), 12);
 
-        removeOldPanel.add(new JLabel("Maximum total number of archived earthquakes: "));
+        removeOldPanel.add(new JLabel(I18n.get("settings.graphics.maxArchived")));
         removeOldPanel.add(textFieldMaxArchived);
 
         eventsPanel.add(removeOldPanel);
@@ -252,17 +253,17 @@ public class GraphicsSettingsPanel extends SettingsPanel{
             Settings.changes++;
         });
 
-        opacityPanel.add(new JLabel("Old events opacity: "));
+        opacityPanel.add(new JLabel(I18n.get("settings.graphics.oldEventsOpacity")));
         opacityPanel.add(sliderOpacity);
 
         eventsPanel.add(opacityPanel);
 
         JPanel colorsPanel = new JPanel();
-        colorsPanel.setBorder(BorderFactory.createTitledBorder("Old events color"));
+        colorsPanel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.graphics.oldEventsColor")));
 
-        JRadioButton buttonColorByAge = new JRadioButton("Color by age");
-        JRadioButton buttonColorByDepth = new JRadioButton("Color by depth");
-        JRadioButton buttonColorByMagnitude = new JRadioButton("Color by magnitude");
+        JRadioButton buttonColorByAge = new JRadioButton(I18n.get("settings.graphics.colorByAge"));
+        JRadioButton buttonColorByDepth = new JRadioButton(I18n.get("settings.graphics.colorByDepth"));
+        JRadioButton buttonColorByMagnitude = new JRadioButton(I18n.get("settings.graphics.colorByMagnitude"));
 
         colorButtons = new JRadioButton[]{buttonColorByAge, buttonColorByDepth, buttonColorByMagnitude};
         ButtonGroup bg = new ButtonGroup();
@@ -291,9 +292,9 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         eventsPanel.add(colorsPanel);
 
         JPanel qualityFilterPanel = new JPanel();
-        qualityFilterPanel.setBorder(BorderFactory.createTitledBorder("Quality"));
+        qualityFilterPanel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.graphics.quality")));
 
-        qualityFilterPanel.add(new JLabel("Only show old events with quality equal or better than: "));
+        qualityFilterPanel.add(new JLabel(I18n.get("settings.graphics.qualityFilter")));
 
         comboBoxQuality = new JComboBox<>(QualityClass.values());
         comboBoxQuality.setSelectedIndex(Math.max(0, Math.min(QualityClass.values().length-1, Settings.qualityFilter)));
@@ -309,27 +310,27 @@ public class GraphicsSettingsPanel extends SettingsPanel{
     private Component createStationsTab() {
         JPanel stationsPanel = new JPanel();
         stationsPanel.setLayout(new BoxLayout(stationsPanel, BoxLayout.Y_AXIS));
-        stationsPanel.setBorder(BorderFactory.createTitledBorder("Stations"));
+        stationsPanel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.graphics.stations")));
 
         JPanel checkBoxes = new JPanel(new GridLayout(1,2));
-        checkBoxes.setBorder(BorderFactory.createTitledBorder("Appearance"));
+        checkBoxes.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.graphics.appearance")));
 
-        chkBoxScheme = new JCheckBox("Use old color scheme (exaggerated)");
+        chkBoxScheme = new JCheckBox(I18n.get("settings.graphics.oldColorScheme"));
         chkBoxScheme.setSelected(Settings.useOldColorScheme);
         checkBoxes.add(chkBoxScheme);
 
-        checkBoxes.add(chkBoxDeadStations = new JCheckBox("Hide stations with no data", Settings.hideDeadStations));
+        checkBoxes.add(chkBoxDeadStations = new JCheckBox(I18n.get("settings.graphics.hideDeadStations"), Settings.hideDeadStations));
 
         stationsPanel.add(checkBoxes);
 
         JPanel stationsShapePanel = new JPanel();
-        stationsShapePanel.setBorder(BorderFactory.createTitledBorder("Shape"));
+        stationsShapePanel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.graphics.shape")));
 
         ButtonGroup buttonGroup = new ButtonGroup();
 
-        JRadioButton buttonCircles = new JRadioButton("Circles");
-        JRadioButton buttonTriangles = new JRadioButton("Triangles");
-        JRadioButton buttonDepends = new JRadioButton("Based on sensor type");
+        JRadioButton buttonCircles = new JRadioButton(I18n.get("settings.graphics.circles"));
+        JRadioButton buttonTriangles = new JRadioButton(I18n.get("settings.graphics.triangles"));
+        JRadioButton buttonDepends = new JRadioButton(I18n.get("settings.graphics.sensorType"));
 
         JRadioButton[] buttons = new JRadioButton[]{buttonCircles, buttonTriangles, buttonDepends};
 
@@ -357,7 +358,7 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         stationsPanel.add(stationsShapePanel);
 
         JPanel intensityPanel = new JPanel(new GridLayout(2,1));
-        intensityPanel.add(new JLabel("Display station's intensity label at zoom level (0 very close, 200 very far):"));
+        intensityPanel.add(new JLabel(I18n.get("settings.graphics.intensityLabelZoom")));
 
         sliderIntensityZoom = new JSlider(SwingConstants.HORIZONTAL, 0, 200, (int) (Settings.stationIntensityVisibilityZoomLevel * 100));
         sliderIntensityZoom.setMajorTickSpacing(10);
@@ -374,7 +375,7 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         stationsPanel.add(intensityPanel);
 
         JPanel stationSizePanel = new JPanel(new GridLayout(2,1));
-        stationSizePanel.add(new JLabel("Stations size multiplier (100 default, 20 tiny, 300 huge):"));
+        stationSizePanel.add(new JLabel(I18n.get("settings.graphics.stationsSizeMul")));
 
         sliderStationsSize = new JSlider(SwingConstants.HORIZONTAL, 20, 300, (int) (Settings.stationsSizeMul * 100));
         sliderStationsSize.setMajorTickSpacing(20);
@@ -391,8 +392,8 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         stationsPanel.add(stationSizePanel);
 
         JPanel brushPanel = new JPanel(new GridLayout(3,1));
-        brushPanel.setBorder(new TitledBorder("Playground Brush (Add Stations)"));
-        brushPanel.add(new JLabel("Station spacing when brushing (km, smaller = denser):"));
+        brushPanel.setBorder(new TitledBorder(I18n.get("settings.graphics.playgroundBrush")));
+        brushPanel.add(new JLabel(I18n.get("settings.graphics.brushSpacing")));
 
         sliderBrushSpacing = new JSlider(SwingConstants.HORIZONTAL, 1, 500, (int)(double)Settings.brushStationSpacingKm);
         sliderBrushSpacing.setMajorTickSpacing(50);
@@ -400,14 +401,14 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         sliderBrushSpacing.setPaintTicks(true);
         sliderBrushSpacing.setPaintLabels(true);
 
-        JLabel brushSpacingLabel = new JLabel("Current spacing: " + sliderBrushSpacing.getValue() + " km");
+        JLabel brushSpacingLabel = new JLabel(I18n.format("settings.graphics.brushSpacingValue", sliderBrushSpacing.getValue()));
         brushPanel.add(sliderBrushSpacing);
         brushPanel.add(brushSpacingLabel);
 
         sliderBrushSpacing.addChangeListener(changeEvent -> {
             Settings.brushStationSpacingKm = (double) sliderBrushSpacing.getValue();
             Settings.changes++;
-            brushSpacingLabel.setText("Current spacing: " + sliderBrushSpacing.getValue() + " km");
+            brushSpacingLabel.setText(I18n.format("settings.graphics.brushSpacingValue", sliderBrushSpacing.getValue()));
         });
 
         stationsPanel.add(brushPanel);
@@ -428,10 +429,10 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         Settings.antialiasingOldQuakes = chkBoxAntialiasOldQuakes.isSelected();
 
         Settings.oldEventsTimeFilterEnabled = chkBoxEnableTimeFilter.isSelected();
-        Settings.oldEventsTimeFilter = parseDouble(textFieldTimeFilter.getText(), "Old events max age", 0, 24 * 365);
+        Settings.oldEventsTimeFilter = parseDouble(textFieldTimeFilter.getText(), I18n.get("settings.graphics.nameMaxAge"), 0, 24 * 365);
 
         Settings.oldEventsMagnitudeFilterEnabled = chkBoxEnableMagnitudeFilter.isSelected();
-        Settings.oldEventsMagnitudeFilter = parseDouble(textFieldMagnitudeFilter.getText(), "Old events min magnitude", 0, 10);
+        Settings.oldEventsMagnitudeFilter = parseDouble(textFieldMagnitudeFilter.getText(), I18n.get("settings.graphics.nameMinMag"), 0, 10);
 
         Settings.oldEventsOpacity = (double) sliderOpacity.getValue();
         Settings.selectedDateFormatIndex = comboBoxDateFormat.getSelectedIndex();
@@ -442,10 +443,10 @@ public class GraphicsSettingsPanel extends SettingsPanel{
         Settings.stationsSizeMul = sliderStationsSize.getValue() / 100.0;
         Settings.brushStationSpacingKm = (double) sliderBrushSpacing.getValue();
 
-        Settings.maxArchivedQuakes = parseInt(textFieldMaxArchived.getText(), "Max number of archived quakes", 1, Integer.MAX_VALUE);
+        Settings.maxArchivedQuakes = parseInt(textFieldMaxArchived.getText(), I18n.get("settings.graphics.nameMaxArchived"), 1, Integer.MAX_VALUE);
 
         Settings.cinemaModeZoomMultiplier= sliderZoomMul.getValue();
-        Settings.cinemaModeSwitchTime = parseInt(textFieldTime.getText(), "Cinema mode switch time", 1, 3600);
+        Settings.cinemaModeSwitchTime = parseInt(textFieldTime.getText(), I18n.get("settings.graphics.nameCinemaSwitchTime"), 1, 3600);
         Settings.cinemaModeOnStartup = chkBoxEnableOnStartup.isSelected();
         Settings.cinemaModeReenable = chkBoxReEnable.isSelected();
 
@@ -467,6 +468,6 @@ public class GraphicsSettingsPanel extends SettingsPanel{
 
     @Override
     public String getTitle() {
-        return "Graphics";
+        return I18n.get("settings.graphics.title");
     }
 }

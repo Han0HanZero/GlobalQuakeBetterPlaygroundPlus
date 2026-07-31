@@ -2,6 +2,7 @@ package gqserver.ui.server.tabs;
 
 import globalquake.core.GlobalQuake;
 import globalquake.core.Settings;
+import globalquake.ui.i18n.I18n;
 import gqserver.events.GlobalQuakeServerEventListener;
 import gqserver.events.specific.ClientJoinedEvent;
 import gqserver.events.specific.ClientLeftEvent;
@@ -64,11 +65,11 @@ public class StatusTab extends JPanel {
         int[] summary = GlobalQuake.instance.getStationDatabaseManager().getSummary();
         seedlinksProgressBar.setMaximum(summary[3]);
         seedlinksProgressBar.setValue(summary[2]);
-        seedlinksProgressBar.setString("Seedlinks: %d / %d".formatted(summary[2], summary[3]));
+        seedlinksProgressBar.setString(I18n.format("server.seedlinksCount", summary[2], summary[3]));
 
         stationsProgressBar.setMaximum(summary[0]);
         stationsProgressBar.setValue(summary[1]);
-        stationsProgressBar.setString("Stations: %d / %d".formatted(summary[1], summary[0]));
+        stationsProgressBar.setString(I18n.format("server.stationsCount", summary[1], summary[0]));
 
     }
 
@@ -76,7 +77,7 @@ public class StatusTab extends JPanel {
         long maxMem = Runtime.getRuntime().maxMemory();
         long usedMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 
-        ramProgressBar.setString("RAM: %.2f / %.2f GB".formatted(usedMem / GB, maxMem / GB));
+        ramProgressBar.setString(I18n.format("server.ram", usedMem / GB, maxMem / GB));
         ramProgressBar.setValue((int) (usedMem / MB));
 
         repaint();
@@ -84,7 +85,7 @@ public class StatusTab extends JPanel {
 
     private synchronized void updateClientsProgressBar() {
         int clients = GlobalQuakeServer.instance.getServerSocket().getClientCount();
-        clientsProgressBar.setString("Clients: %d / %d".formatted(clients, Settings.maxClients));
+        clientsProgressBar.setString(I18n.format("server.clientsCount", clients, Settings.maxClients));
         clientsProgressBar.setValue(clients);
         repaint();
     }

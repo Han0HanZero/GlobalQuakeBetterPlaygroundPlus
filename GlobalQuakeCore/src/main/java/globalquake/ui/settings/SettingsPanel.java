@@ -2,6 +2,7 @@ package globalquake.ui.settings;
 
 
 import globalquake.core.exception.RuntimeApplicationException;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 
@@ -16,11 +17,11 @@ public abstract class SettingsPanel extends JPanel{
 	public double parseDouble(String str, String name, double min, double max){
 		double d = Double.parseDouble(str.replace(',', '.'));
 		if(Double.isNaN(d) || Double.isInfinite(d)){
-			throw new RuntimeApplicationException("Invalid number: %s".formatted(str));
+			throw new RuntimeApplicationException(I18n.format("settings.error.invalidNumber", str));
 		}
 
 		if(d < min || d > max){
-			throw new RuntimeApplicationException("%s must be between %s and %s (entered %s)!".formatted(name, min, max, d));
+			throw new RuntimeApplicationException(I18n.format("settings.error.outOfRange", name, min, max, d));
 		}
 
 		return d;
@@ -30,7 +31,7 @@ public abstract class SettingsPanel extends JPanel{
 		int n = Integer.parseInt(str);
 
 		if(n < min || n > max){
-			throw new RuntimeApplicationException("%s must be between %s and %s (entered %s)!".formatted(name, min, max, n));
+			throw new RuntimeApplicationException(I18n.format("settings.error.outOfRange", name, min, max, n));
 		}
 
 		return n;

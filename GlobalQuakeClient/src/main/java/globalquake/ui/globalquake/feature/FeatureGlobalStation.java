@@ -1,5 +1,7 @@
 package globalquake.ui.globalquake.feature;
 
+import globalquake.core.GQFonts;
+
 import globalquake.client.GlobalQuakeClient;
 import globalquake.core.analysis.AnalysisStatus;
 import globalquake.core.analysis.Event;
@@ -13,6 +15,7 @@ import globalquake.ui.globe.feature.RenderElement;
 import globalquake.ui.globe.feature.RenderEntity;
 import globalquake.ui.globe.feature.RenderFeature;
 import globalquake.core.Settings;
+import globalquake.ui.i18n.I18n;
 import globalquake.ui.settings.StationsShape;
 import globalquake.ui.stationselect.FeatureSelectableStation;
 import globalquake.utils.Scale;
@@ -160,7 +163,7 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
 
         graphics.setStroke(new BasicStroke(1f));
 
-        graphics.setFont(new Font("Calibri", Font.PLAIN, 13));
+        graphics.setFont(GQFonts.font(Font.PLAIN, 13));
 
         Vector3D point3D = null;
         Point2D centerPoint = null;
@@ -244,7 +247,7 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
         if (scroll < Settings.stationIntensityVisibilityZoomLevel || (mouseNearby && scroll < 1)) {
             g.setColor(Color.white);
             String str = !station.hasDisplayableData() ? "-.-" : "%.1f".formatted(station.getMaxRatio60S());
-            g.setFont(new Font("Calibri", Font.PLAIN, 13));
+            g.setFont(GQFonts.font(Font.PLAIN, 13));
             g.setColor(station.getAnalysis().getStatus() == AnalysisStatus.EVENT ? Color.green : Color.LIGHT_GRAY);
             if(centerPoint == null) {
                 var point3D = GlobeRenderer.createVec3D(getCenterCoords(entity));

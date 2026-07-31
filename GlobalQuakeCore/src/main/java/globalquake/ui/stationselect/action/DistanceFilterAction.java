@@ -1,5 +1,6 @@
 package globalquake.ui.stationselect.action;
 
+import globalquake.ui.i18n.I18n;
 import globalquake.core.database.Network;
 import globalquake.core.database.Station;
 import globalquake.core.database.StationDatabaseManager;
@@ -45,7 +46,7 @@ public class DistanceFilterAction extends AbstractAction {
                     throw new NumberFormatException();
                 }
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(parent, "Invalid input. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parent, I18n.get("stationselect.invalidInput"), I18n.get("common.error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }

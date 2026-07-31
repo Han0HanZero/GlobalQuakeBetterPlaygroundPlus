@@ -1,5 +1,6 @@
 package globalquake.core.database;
 
+import globalquake.ui.i18n.I18n;
 import globalquake.core.exception.FdnwsDownloadException;
 import gqserver.api.packets.station.InputType;
 import org.tinylog.Logger;
@@ -98,7 +99,7 @@ public class FDSNWSDownloader {
 
         if (response == 413) {
             Logger.debug("413! Splitting...");
-            stationSource.getStatus().setString("Splitting...");
+            stationSource.getStatus().setString(I18n.get("source.status.splitting"));
             if(maxLon - minLon < 0.1){
                 return;
             }
@@ -119,7 +120,7 @@ public class FDSNWSDownloader {
         f.setValidating(false);
         final CountInputStream in = new CountInputStream(inp);
 
-        in.setEvent(() ->  stationSource.getStatus().setString("Downloading %dkB".formatted(in.getCount() / 1024)));
+        in.setEvent(() ->  stationSource.getStatus().setString(I18n.format("source.status.downloading", in.getCount() / 1024)));
 
         String text = new String(in.readAllBytes(), StandardCharsets.UTF_8);
 

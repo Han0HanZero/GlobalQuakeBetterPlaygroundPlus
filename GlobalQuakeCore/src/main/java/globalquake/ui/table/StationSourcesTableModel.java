@@ -1,6 +1,7 @@
 package globalquake.ui.table;
 
 import globalquake.core.database.StationSource;
+import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
 import java.time.LocalDateTime;
@@ -8,10 +9,10 @@ import java.util.List;
 
 public class StationSourcesTableModel extends FilterableTableModel<StationSource>{
     private final List<Column<StationSource, ?>> columns = List.of(
-            Column.readonly("Name", String.class, StationSource::getName, new TableCellRendererAdapter<>()),
-            Column.readonly("URL", String.class, StationSource::getUrl, new TableCellRendererAdapter<>()),
-            Column.readonly("Last Update", LocalDateTime.class, StationSource::getLastUpdate, new LastUpdateRenderer<>()),
-            Column.readonly("Status", JProgressBar.class, StationSource::getStatus, new ProgressBarRenderer<>()));
+            Column.readonly(I18n.get("table.name"), String.class, StationSource::getName, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.url"), String.class, StationSource::getUrl, new TableCellRendererAdapter<>()),
+            Column.readonly(I18n.get("table.lastUpdate"), LocalDateTime.class, StationSource::getLastUpdate, new LastUpdateRenderer<>()),
+            Column.readonly(I18n.get("table.status"), JProgressBar.class, StationSource::getStatus, new ProgressBarRenderer<>()));
 
     public StationSourcesTableModel(List<StationSource> data) {
         super(data);

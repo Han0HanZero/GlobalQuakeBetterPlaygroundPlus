@@ -1,5 +1,6 @@
 package globalquake.ui;
 
+import globalquake.ui.i18n.I18n;
 import globalquake.core.database.Channel;
 import globalquake.core.database.Network;
 import globalquake.core.database.Station;
@@ -21,10 +22,10 @@ public class StationCountPanel extends JPanel {
         this.manager = manager;
         setLayout(layoutManager);
 
-        add(total = new CounterPanel("Total Channels", StationColor.ALL));
-        add(available = new CounterPanel("Available Channels", StationColor.AVAILABLE));
-        add(selected = new CounterPanel("Selected Channels", StationColor.SELECTED));
-        add(unavailable = new CounterPanel("Unavailable Channels", StationColor.UNAVAILABLE));
+        add(total = new CounterPanel(I18n.get("stationcount.total"), StationColor.ALL));
+        add(available = new CounterPanel(I18n.get("stationcount.available"), StationColor.AVAILABLE));
+        add(selected = new CounterPanel(I18n.get("stationcount.selected"), StationColor.SELECTED));
+        add(unavailable = new CounterPanel(I18n.get("stationcount.unavailable"), StationColor.UNAVAILABLE));
 
         manager.addUpdateListener(this::recalculate);
 
