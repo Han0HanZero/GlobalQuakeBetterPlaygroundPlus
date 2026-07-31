@@ -179,16 +179,17 @@ public class BetterAnalysis extends Analysis {
         double velocity = Math.abs(waveformDefault.getVelocity());
         double velocityLowFreq = Math.abs(waveformLowFreq.getVelocity());
         double velocityUltraLowFreq = Math.abs(waveformUltraLowFreq.getVelocity());
+        double velocityBroadband = Math.max(Math.max(velocity, velocityLowFreq), velocityUltraLowFreq);
 
-        if (velocity > _maxVelocity) {
-            _maxVelocity = velocity;
+        if (velocityBroadband > _maxVelocity) {
+            _maxVelocity = velocityBroadband;
         }
 
         if (ratio > _maxRatio || _maxRatioReset) {
             _maxRatio = ratio * 1.25;
 
             if (_maxRatioReset) {
-                _maxVelocity = velocity;
+                _maxVelocity = velocityBroadband;
             }
 
             _maxRatioReset = false;

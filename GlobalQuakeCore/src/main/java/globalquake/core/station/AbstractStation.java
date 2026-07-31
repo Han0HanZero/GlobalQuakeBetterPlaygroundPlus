@@ -30,6 +30,7 @@ public abstract class AbstractStation {
 	private final SeedlinkNetwork seedlinkNetwork;
 
 	private final Deque<Double> ratioHistory = new LinkedBlockingDeque<>();
+	private final Deque<Double> velocityHistory = new LinkedBlockingDeque<>();
 	private final double sensitivity;
 	public boolean disabled = false;
 	public double _lastRenderSize;
@@ -157,6 +158,13 @@ public abstract class AbstractStation {
 			}
 		}
 
+		if (isSensitivityValid() && getAnalysis()._maxVelocity > 0) {
+			velocityHistory.add(getAnalysis()._maxVelocity);
+			if (velocityHistory.size() >= RATIO_HISTORY_SECONDS) {
+				velocityHistory.remove();
+			}
+		}
+
 		getAnalysis().second(time);
 	}
 
@@ -165,8 +173,14 @@ public abstract class AbstractStation {
 		return opt.orElse(0.0);
 	}
 
+	public double getMaxVelocity60S() {
+		var opt = velocityHistory.stream().max(Double::compareTo);
+		return opt.orElse(0.0);
+	}
+
 	public void reset() {
 		ratioHistory.clear();
+		velocityHistory.clear();
 	}
 
 	public int getId() {

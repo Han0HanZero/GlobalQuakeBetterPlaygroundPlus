@@ -43,6 +43,7 @@ public class ClientStation extends GlobalStation {
 
     @Override
     public double getMaxRatio60S() {
+        if (getDelayMS() > 60 * 1000) return 0;
         return intensity;
     }
 }

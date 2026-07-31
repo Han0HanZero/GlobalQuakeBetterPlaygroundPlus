@@ -15,6 +15,8 @@ import globalquake.ui.globe.feature.RenderElement;
 import globalquake.ui.globe.feature.RenderEntity;
 import globalquake.ui.globe.feature.RenderFeature;
 import globalquake.core.Settings;
+import globalquake.core.intensity.IntensityScales;
+import globalquake.core.intensity.Level;
 import globalquake.ui.i18n.I18n;
 import globalquake.ui.settings.StationsShape;
 import globalquake.ui.stationselect.FeatureSelectableStation;
@@ -24,6 +26,7 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.List;
 
 public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
 
@@ -35,6 +38,31 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
     public FeatureGlobalStation(Collection<AbstractStation> globalStations) {
         super(2);
         this.globalStations = globalStations;
+    }
+
+    public static double computePGA(AbstractStation station) {
+        double ratio = station.getMaxRatio60S();
+        if (ratio < 5.0) return 0;
+        double ratioGain = Math.pow(ratio / 10.0, 0.5);
+
+        if (station.isSensitivityValid()) {
+            double velCounts = station.getMaxVelocity60S();
+            if (velCounts <= 0) {
+                return Math.min(1.0, ratioGain * 0.5);
+            }
+            double physV = velCounts / station.getSensitivity();
+            double pga = physV * 2.0 * Math.PI * 1.2 * 100.0;
+            return Math.max(pga, pga * Math.pow(ratio / 1000.0, 0.35)) * Math.max(1.0, ratioGain * 0.25);
+        }
+
+        // Unknown sensitivity (Seedlink remote stations): ratio-only empirical fit
+        return 0.040 * Math.pow(ratio, 0.74);
+    }
+
+    public static Level computeIntensityLevel(AbstractStation station) {
+        double pga = computePGA(station);
+        if (pga < 0.5) return null;
+        return IntensityScales.getIntensityScale().getLevel(pga);
     }
 
     @Override
@@ -141,17 +169,48 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
     public void render(GlobeRenderer renderer, Graphics2D graphics, RenderEntity<AbstractStation> entity, RenderProperties renderProperties) {
         RenderElement elementStationCircle = entity.getRenderElement(0);
 
-
         if(!elementStationCircle.shouldDraw){
             return;
         }
 
-        RenderElement elementStationSquare = entity.getRenderElement(1);
+        AbstractStation station = entity.getOriginal();
+        Level level = computeIntensityLevel(station);
 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 Settings.antialiasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
-        graphics.setColor(getDisplayColor(entity.getOriginal()));
-        graphics.fill(elementStationCircle.getShape());
+
+        Vector3D point3D = GlobeRenderer.createVec3D(getCenterCoords(entity));
+        Point2D centerPoint = renderer.projectPoint(point3D, renderProperties);
+
+        RenderElement elementStationSquare = entity.getRenderElement(1);
+
+        if (level != null && centerPoint != null) {
+            List<Level> levels = IntensityScales.getIntensityScale().getLevels();
+            int levelIdx = levels.indexOf(level);
+            double radiusPx = (12.0 + Math.max(0, levelIdx) * 0.9) * Settings.stationsSizeMul;
+            int r = (int) Math.round(radiusPx);
+            int cx = (int) Math.round(centerPoint.x);
+            int cy = (int) Math.round(centerPoint.y);
+            graphics.setColor(level.getColor());
+            graphics.fillOval(cx - r, cy - r, r * 2, r * 2);
+            graphics.setColor(Color.white);
+            graphics.setStroke(new BasicStroke(1.5f));
+            graphics.drawOval(cx - r, cy - r, r * 2, r * 2);
+            graphics.setStroke(new BasicStroke(1f));
+            int fontSize = Math.max(10, Math.min(r * 2 / Math.max(1, level.getFullName().length()), r));
+            graphics.setFont(GQFonts.font(Font.BOLD, fontSize));
+            FontMetrics fm = graphics.getFontMetrics();
+            String label = level.getFullName();
+            int tw = fm.stringWidth(label);
+            int th = fm.getAscent();
+            graphics.setColor(Color.black);
+            graphics.drawString(label, cx - tw / 2 + 1, cy + th / 2 - 2 + 1);
+            graphics.setColor(Color.white);
+            graphics.drawString(label, cx - tw / 2, cy + th / 2 - 2);
+        } else {
+            graphics.setColor(getDisplayColor(station));
+            graphics.fill(elementStationCircle.getShape());
+        }
 
         boolean mouseNearby = renderer.getLastMouse() != null && renderer.hasMouseMovedRecently() && elementStationCircle.getShape().contains(renderer.getLastMouse());
 
@@ -165,18 +224,11 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
 
         graphics.setFont(GQFonts.font(Font.PLAIN, 13));
 
-        Vector3D point3D = null;
-        Point2D centerPoint = null;
         if(Settings.displayClusters){
-            for(Event event2 : entity.getOriginal().getAnalysis().getDetectedEvents()){
+            for(Event event2 : station.getAnalysis().getDetectedEvents()){
                 Cluster cluster = event2.assignedCluster;
                 if(cluster != null){
                     Color c = !event2.isValid() ? Color.gray : cluster.color;
-
-                    if(point3D == null) {
-                        point3D = GlobeRenderer.createVec3D(getCenterCoords(entity));
-                        centerPoint = renderer.projectPoint(point3D, renderProperties);
-                    }
 
                     int _y = (int) centerPoint.y + 4;
                     _y += 16;
@@ -188,10 +240,10 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
                     graphics.drawString("Cluster #"+cluster.id, (int) centerPoint.x + 12, _y);
                 }
             }
-        } else if (entity.getOriginal().isInEventMode() && ((System.currentTimeMillis() / 500) % 2 == 0)) {
+        } else if (station.isInEventMode() && ((System.currentTimeMillis() / 500) % 2 == 0)) {
             Color c = Color.green;
 
-            double maxRatio = entity.getOriginal().getMaxRatio60S();
+            double maxRatio = station.getMaxRatio60S();
 
             if (maxRatio >= RATIO_YELLOW) {
                 c = Color.yellow;
@@ -208,11 +260,11 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
 
 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-        drawDetails(mouseNearby, renderProperties.scroll, centerPoint, graphics, entity.getOriginal(), renderer, entity, renderProperties);
+        drawDetails(mouseNearby, renderProperties.scroll, centerPoint, graphics, station, renderer, entity, renderProperties, level);
     }
 
     private void drawDetails(boolean mouseNearby, double scroll, Point2D centerPoint, Graphics2D g, AbstractStation station, GlobeRenderer renderer,
-                             RenderEntity<AbstractStation> entity, RenderProperties renderProperties) {
+                             RenderEntity<AbstractStation> entity, RenderProperties renderProperties, Level level) {
         int _y = (int) (7 + 6 * Settings.stationsSizeMul);
         if (mouseNearby && scroll < 1) {
             g.setColor(Color.white);
@@ -245,18 +297,19 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
             }
         }
         if (scroll < Settings.stationIntensityVisibilityZoomLevel || (mouseNearby && scroll < 1)) {
-            g.setColor(Color.white);
-            String str = !station.hasDisplayableData() ? "-.-" : "%.1f".formatted(station.getMaxRatio60S());
-            g.setFont(GQFonts.font(Font.PLAIN, 13));
-            g.setColor(station.getAnalysis().getStatus() == AnalysisStatus.EVENT ? Color.green : Color.LIGHT_GRAY);
-            if(centerPoint == null) {
-                var point3D = GlobeRenderer.createVec3D(getCenterCoords(entity));
-                centerPoint = renderer.projectPoint(point3D, renderProperties);
-            }
+            if (level == null) {
+                String str = !station.hasDisplayableData() ? "-.-" : "%.1f".formatted(station.getMaxRatio60S());
+                g.setFont(GQFonts.font(Font.PLAIN, 13));
+                g.setColor(station.getAnalysis().getStatus() == AnalysisStatus.EVENT ? Color.green : Color.LIGHT_GRAY);
+                if(centerPoint == null) {
+                    var point3D = GlobeRenderer.createVec3D(getCenterCoords(entity));
+                    centerPoint = renderer.projectPoint(point3D, renderProperties);
+                }
 
-            int x = (int) centerPoint.x;
-            int y = (int) centerPoint.y;
-            g.drawString(str, x - g.getFontMetrics().stringWidth(str) / 2, y + _y + 9);
+                int x = (int) centerPoint.x;
+                int y = (int) centerPoint.y;
+                g.drawString(str, x - g.getFontMetrics().stringWidth(str) / 2, y + _y + 9);
+            }
         }
     }
 

@@ -171,5 +171,6 @@ public class ShakemapService {
 
     public void clear() {
         shakeMaps.clear();
+        GlobalQuakeLocal.instance.getLocalEventHandler().fireEvent(new ShakeMapsUpdatedEvent());
     }
 }
