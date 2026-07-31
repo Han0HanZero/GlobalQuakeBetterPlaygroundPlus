@@ -56,6 +56,10 @@ public class PlaygroundStation extends AbstractStation {
         return generator.getDelay();
     }
 
+    public long getBias() {
+        return generator.getBias();
+    }
+
     /**
      * 重置 StationWaveformGenerator 的地震距离缓存 + 重置波形分析状态。
      * 对应「清除地震后再创建新地震时无法拾取」的修复：

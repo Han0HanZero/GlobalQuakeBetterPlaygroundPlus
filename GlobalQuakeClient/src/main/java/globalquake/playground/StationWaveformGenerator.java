@@ -86,6 +86,10 @@ public class StationWaveformGenerator {
         return delay;
     }
 
+    public long getBias() {
+        return bias;
+    }
+
     /**
      * 清空地震距离缓存，避免「清除地震再创建新地震」时旧缓存干扰信号振幅计算。
      * 同时强制所有下一次 getPowerFromQuake 调用重新计算 Distances。
@@ -147,7 +151,19 @@ public class StationWaveformGenerator {
             result += 2E3 * decay * increase * psRatio(gcd);
         }
 
-        return result * distances.distMultiplier * MFR[i] * Math.sqrt(freq) * sensMul;
+        // 两段式距离衰减（模拟几何扩散+非弹性衰减）：
+        //   d < 100km: 1/(1+(d/28)^1.7)      —— 近场陡，7 度区（>400gal，近场 2000gal 基准）压到 ~63km
+        //   d >=100km: 0.102*(100/d)^0.65    —— 远场缓（斜率 0.65）：400km 信号比 0.75 版强 ~15%、800km ~23%、
+        //                                       1600km ~31%。配合 psRatio 的 S 波增强与 computePGA 饱和，
+        //                                       M9 远场(400-2000km) 接近真实 2-4 度。近场段不受影响。
+        // 效果：63km≈0.2、100km≈0.102、200km≈0.065、400km≈0.041、800km≈0.0264、1600km≈0.0168
+        // 参考：Shi & Midorikawa(1999) 与 BSSA 点源衰减；之前 (55,2.4)/(36,1.55) 单参数幂律
+        // 无法同时满足近场快衰减(7度区过大)与远场缓衰减(400km+ 无感)两个要求。
+        double d = gcd;
+        double attenuation = d < 100.0
+                ? 1.0 / (1.0 + Math.pow(d / 28.0, 1.7))
+                : 0.102 * Math.pow(100.0 / d, 0.65);
+        return result * distances.distMultiplier * attenuation * MFR[i] * Math.sqrt(freq) * sensMul;
     }
 
     private static double getMagnitudeFrequencyRange(double mag, double freq) {
@@ -166,7 +182,10 @@ public class StationWaveformGenerator {
     }
 
     private double psRatio(double gcd) {
-        return 2.0 / (0.000015 * gcd * gcd + 1);
+        // S/P 振幅比：真实世界 S 波是 P 波的 3~10 倍（Hardebeck & Shearer 2003；Funabiki 2025 GRL）。
+        // 旧公式 2/(1+0.000015d²) 在 258km 后 S<P，与真实规律相反，也是远场无感的原因之一。
+        // 新公式：近场 ~3.5 倍、远场保底 2 倍，随距离缓慢衰减。地震震级测定已同步抵消该增强。
+        return 2.0 + 1.5 * Math.exp(-gcd / 300.0);
     }
 
 }

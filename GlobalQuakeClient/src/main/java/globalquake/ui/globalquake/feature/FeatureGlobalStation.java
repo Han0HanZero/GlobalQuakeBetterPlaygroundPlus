@@ -6,6 +6,12 @@ import globalquake.client.GlobalQuakeClient;
 import globalquake.core.analysis.AnalysisStatus;
 import globalquake.core.analysis.Event;
 import globalquake.core.earthquake.data.Cluster;
+// ==================== 调试日志备用 import（默认保留，取消注释调试代码后直接可用） ====================
+import globalquake.core.GlobalQuake;
+import globalquake.core.earthquake.data.Earthquake;
+import globalquake.core.geo.taup.TauPTravelTimeCalculator;
+import globalquake.playground.PlaygroundStation;
+// ==============================================================================================
 import globalquake.core.station.AbstractStation;
 import globalquake.ui.globe.GlobeRenderer;
 import globalquake.ui.globe.Point2D;
@@ -17,16 +23,19 @@ import globalquake.ui.globe.feature.RenderFeature;
 import globalquake.core.Settings;
 import globalquake.core.intensity.IntensityScales;
 import globalquake.core.intensity.Level;
-import globalquake.ui.i18n.I18n;
 import globalquake.ui.settings.StationsShape;
 import globalquake.ui.stationselect.FeatureSelectableStation;
+import globalquake.utils.GeoUtils; // 调试日志备用 import（与上面调试代码配套）
 import globalquake.utils.Scale;
 import gqserver.api.packets.station.InputType;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.awt.*;
+import java.io.FileWriter; // 调试日志备用 import
+import java.io.PrintWriter; // 调试日志备用 import
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong; // 调试日志备用 import
 
 public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
 
@@ -45,19 +54,111 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
         if (ratio < 5.0) return 0;
         double ratioGain = Math.pow(ratio / 10.0, 0.5);
 
+        double result;
         if (station.isSensitivityValid()) {
             double velCounts = station.getMaxVelocity60S();
             if (velCounts <= 0) {
-                return Math.min(1.0, ratioGain * 0.5);
+                result = Math.min(1.0, ratioGain * 0.5);
+            } else {
+                double physV = velCounts / station.getSensitivity();
+                double pga = physV * 2.0 * Math.PI * 1.2 * 100.0;
+                // ratioGain=(ratio/10)^0.5 在 ratio 千万级时放大 ~291 倍，是 M9 中距离(100-200km)
+                // 虚高到 2000+ gal(7度) 的根因。对放大因子饱和封顶(等效对数压缩)：
+                //   cap=45：M9 近场 20km→427gal(7度)、109km→385(6+)、137km→80(5-)，
+                //           M4 12km→13.5(3度)、26km→3.3(2-3度)；
+                //   cap=22 时全部偏低 1-2 度（M4 中距离原放大 43-75 也被误压）。
+                result = Math.max(pga, pga * Math.pow(ratio / 1000.0, 0.35)) * Math.max(1.0, Math.min(ratioGain * 0.25, 45.0));
             }
-            double physV = velCounts / station.getSensitivity();
-            double pga = physV * 2.0 * Math.PI * 1.2 * 100.0;
-            return Math.max(pga, pga * Math.pow(ratio / 1000.0, 0.35)) * Math.max(1.0, ratioGain * 0.25);
+        } else {
+            // Unknown sensitivity (Seedlink remote stations): ratio-only empirical fit
+            result = 0.040 * Math.pow(ratio, 0.74);
         }
 
-        // Unknown sensitivity (Seedlink remote stations): ratio-only empirical fit
-        return 0.040 * Math.pow(ratio, 0.74);
+        // ==================== 临时调试日志（备用，默认注释） ====================
+        // 需要时取消注释：写入 intensity_debug.log，含地震信息、震中距与 P/S 波阶段。
+        // 取消注释前请确认下方 debugCounter/DEBUG_FILE/calcPhase 及文件头部 import 已恢复。
+        /*
+        try {
+            long idx = debugCounter.incrementAndGet();
+            // 阶段提前计算（需第一个地震的震中距）：P后S前窗口短暂，该阶段强制逐条记录
+            String phase = "?";
+            Earthquake q0 = null;
+            if (GlobalQuake.instance != null && GlobalQuake.instance.getEarthquakeAnalysis() != null
+                    && !GlobalQuake.instance.getEarthquakeAnalysis().getEarthquakes().isEmpty()) {
+                q0 = GlobalQuake.instance.getEarthquakeAnalysis().getEarthquakes().get(0);
+                double dist0 = GeoUtils.greatCircleDistance(
+                        station.getLatitude(), station.getLongitude(), q0.getLat(), q0.getLon());
+                phase = calcPhase(station, q0, dist0);
+            }
+            if ("P".equals(phase) || idx % 10 == 1) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(String.format("[DEBUG] %s | ratio=%.1f vel=%.4f sens=%.2E pga=%.2f",
+                        station.getStationCode(), ratio,
+                        station.getMaxVelocity60S(), station.getSensitivity(), result));
+                if (GlobalQuake.instance != null && GlobalQuake.instance.getEarthquakeAnalysis() != null) {
+                    var quakes = GlobalQuake.instance.getEarthquakeAnalysis().getEarthquakes();
+                    if (quakes.isEmpty()) {
+                        sb.append(" | 无活动地震");
+                    } else {
+                        sb.append(" | 地震[");
+                        for (int i = 0; i < quakes.size(); i++) {
+                            Earthquake q = quakes.get(i);
+                            double dist = GeoUtils.greatCircleDistance(
+                                    station.getLatitude(), station.getLongitude(), q.getLat(), q.getLon());
+                            if (i > 0) sb.append("; ");
+                            sb.append(String.format("M%.1f 距%.0fkm", q.getMag(), dist));
+                        }
+                        sb.append("]");
+                        sb.append(" | 阶段=").append(phase);
+                    }
+                }
+                Level level = IntensityScales.getIntensityScale().getLevel(result);
+                sb.append(" | 烈度=").append(level == null ? "N/A" : level.toString());
+                try (PrintWriter pw = new PrintWriter(new FileWriter(DEBUG_FILE, true))) {
+                    pw.println(sb);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        */
+
+        return result;
     }
+
+    /*
+    // ==================== 调试用字段与方法（备用，默认注释） ====================
+    private static final AtomicLong debugCounter = new AtomicLong();
+    private static final String DEBUG_FILE = "intensity_debug.log";
+
+    private static String calcPhase(AbstractStation station, Earthquake q, double dist) {
+        // 判断当前时刻处于哪个波相阶段：前=P波未到、P=P波已到S波未到、S=S波已到。
+        // 三点必须一致，否则阶段会系统性错乱（曾出现全 S / 全 P）：
+        //   1) 时钟：用 GlobalQuake.instance.currentTimeMillis()（Playground 为模拟时钟，
+        //      origin 也是模拟时钟；若用 System.currentTimeMillis() 会差一个固定偏移导致永远 S）；
+        //   2) bias+delay：站实际看到波形的时刻 = origin + 走时 + bias（波形时间偏移）
+        //      + delay（采样延迟，见 WaveformGenerator.now = currentTimeMillis - delay）；
+        //   3) 走时：TauP 理论走时。
+        try {
+            double pTravel = TauPTravelTimeCalculator.getPWaveTravelTime(q.getDepth(), TauPTravelTimeCalculator.toAngle(dist));
+            double sTravel = TauPTravelTimeCalculator.getSWaveTravelTime(q.getDepth(), TauPTravelTimeCalculator.toAngle(dist));
+            if (pTravel == TauPTravelTimeCalculator.NO_ARRIVAL || sTravel == TauPTravelTimeCalculator.NO_ARRIVAL) {
+                return "?";
+            }
+            long now = GlobalQuake.instance.currentTimeMillis();
+            long offset = 0;
+            if (station instanceof PlaygroundStation ps) {
+                offset = ps.getBias() + ps.getDelay();
+            }
+            long pArrival = q.getOrigin() + (long) (pTravel * 1000) + offset;
+            long sArrival = q.getOrigin() + (long) (sTravel * 1000) + offset;
+            if (now < pArrival) return "前";
+            if (now < sArrival) return "P";
+            return "S";
+        } catch (Exception e) {
+            return "?";
+        }
+    }
+    */
 
     public static Level computeIntensityLevel(AbstractStation station) {
         double pga = computePGA(station);

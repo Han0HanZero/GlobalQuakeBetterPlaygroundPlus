@@ -1089,6 +1089,22 @@ public class EarthquakeAnalysis {
             // *0.5 because s wave is stronger
             double mul = sTravelRaw == TauPTravelTimeCalculator.NO_ARRIVAL || lastRecord > expectedSArrival + 8 * 1000 ? 0.95 : Math.max(1, 3 - distGC / 400.0);
 
+            // Playground 模式震级补偿：StationWaveformGenerator 对波形施加了两段式距离衰减
+            //   d < 100km: 1/(1+(d/28)^1.7)；d >= 100km: 0.102*(100/d)^0.65
+            // 这里乘其倒数还原远场台站振幅，否则远场振幅被削弱导致震级被低估（如 M9 被算成 ~M7.4）。
+            // 再抵消 psRatio 的 S 波增强（新 psRatio = 2+1.5exp(-d/300)，旧 = 2/(1+0.000015d²)）：
+            // S 波增强已体现在 maxVelocity counts 中，需除以新/旧比值使震级测定不受其影响。
+            // 注意：以下公式必须与 StationWaveformGenerator 同步修改。
+            if (GlobalQuake.instance.isSimulation()) {
+                double dd = distGC;
+                mul *= dd < 100.0
+                        ? 1.0 + Math.pow(dd / 28.0, 1.7)
+                        : (1.0 / 0.102) * Math.pow(dd / 100.0, 0.65);
+                double psNew = 2.0 + 1.5 * Math.exp(-dd / 300.0);
+                double psOld = 2.0 / (0.000015 * dd * dd + 1.0);
+                mul *= psOld / psNew;
+            }
+
             double maxVelocity = event.getMaxVelocity(magnitudeType);
 
             InputType inputType = event.getAnalysis().getStation().getInputType();
