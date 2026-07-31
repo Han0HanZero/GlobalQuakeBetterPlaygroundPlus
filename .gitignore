@@ -53,3 +53,6 @@ science/
 .idea/
 /screenshots/
 latest/
+
+# raw source files (data conversion inputs, not needed for runtime)
+.files/
