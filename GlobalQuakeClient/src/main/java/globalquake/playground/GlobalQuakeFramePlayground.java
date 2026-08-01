@@ -15,6 +15,12 @@ import globalquake.ui.i18n.I18n;
 import org.tinylog.Logger;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -28,6 +34,8 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.w3c.dom.Document;
 
 public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
 
@@ -468,6 +476,12 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
             formPanel.add(field, gbc);
         }
 
+        // 从 QuakeML 文件导入参数（自动填充上方字段）
+        gbc.gridx = 0; gbc.gridy = fields.length; gbc.gridwidth = 2; gbc.weightx = 0.0;
+        JButton importBtn = new JButton(I18n.get("playground.custom.importQuakeML"));
+        importBtn.addActionListener(e -> importFromQuakeML(magField, latField, lonField, depthField));
+        formPanel.add(importBtn, gbc);
+
         int result = JOptionPane.showConfirmDialog(this, formPanel,
                 I18n.get("playground.custom.title"),
                 JOptionPane.OK_CANCEL_OPTION,
@@ -531,6 +545,78 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
             timer.setRepeats(false);
             timer.start();
         }
+    }
+
+    private void importFromQuakeML(JTextField magField, JTextField latField, JTextField lonField, JTextField depthField) {
+        JFileChooser fc = new JFileChooser();
+        fc.setFileFilter(new FileNameExtensionFilter("QuakeML (*.xml)", "xml"));
+        // 默认打开运行目录下的 quakeml 文件夹（不存在则自动创建）
+        File quakemlDir = new File("quakeml");
+        if (!quakemlDir.exists() && !quakemlDir.mkdirs()) {
+            Logger.warn("Unable to create quakeml folder: " + quakemlDir.getAbsolutePath());
+        } else {
+            fc.setCurrentDirectory(quakemlDir);
+        }
+        if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        try {
+            double[] vals = parseQuakeML(fc.getSelectedFile());
+            magField.setText(String.valueOf(vals[0]));
+            latField.setText(String.format("%.4f", vals[1]));
+            lonField.setText(String.format("%.4f", vals[2]));
+            depthField.setText(String.valueOf(vals[3]));
+        } catch (Exception ex) {
+            Logger.error(ex);
+            JOptionPane.showMessageDialog(this,
+                    I18n.format("playground.custom.importFailed", ex.getMessage()),
+                    I18n.get("common.error"), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * 解析 QuakeML（fdsn 1.2）文件，提取震级、震中经纬度、震源深度（km）。
+     * 优先使用 preferredMagnitudeID / preferredOriginID 指向的块；缺失时退回第一个匹配块。
+     */
+    private static double[] parseQuakeML(File file) throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        // XXE 防护：禁止 DTD/外部实体
+        dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        dbf.setExpandEntityReferences(false);
+        Document doc = dbf.newDocumentBuilder().parse(file);
+        XPath xpath = XPathFactory.newInstance().newXPath();
+
+        String prefOrigin = text(xpath, doc, "//*[local-name()='event']/*[local-name()='preferredOriginID']");
+        String prefMag = text(xpath, doc, "//*[local-name()='event']/*[local-name()='preferredMagnitudeID']");
+
+        String magExpr = prefMag != null
+                ? "//*[local-name()='magnitude' and @publicID='" + prefMag + "']//*[local-name()='mag']/*[local-name()='value']"
+                : "(//*[local-name()='magnitude']//*[local-name()='mag']/*[local-name()='value'])[1]";
+        String originExpr = prefOrigin != null
+                ? "//*[local-name()='origin' and @publicID='" + prefOrigin + "']"
+                : "(//*[local-name()='origin'])[1]";
+
+        String magStr = text(xpath, doc, magExpr);
+        String latStr = text(xpath, doc, originExpr + "//*[local-name()='latitude']/*[local-name()='value']");
+        String lonStr = text(xpath, doc, originExpr + "//*[local-name()='longitude']/*[local-name()='value']");
+        String depthStr = text(xpath, doc, originExpr + "//*[local-name()='depth']/*[local-name()='value']");
+
+        if (magStr == null || latStr == null || lonStr == null) {
+            throw new IllegalArgumentException("QuakeML missing magnitude/latitude/longitude");
+        }
+        double mag = Double.parseDouble(magStr);
+        double lat = Double.parseDouble(latStr);
+        double lon = Double.parseDouble(lonStr);
+        double depth = depthStr == null ? 10.0 : Double.parseDouble(depthStr) / 1000.0; // QuakeML depth 单位米 → km
+        return new double[]{mag, lat, lon, depth};
+    }
+
+    private static String text(XPath xpath, Document doc, String expr) throws XPathExpressionException {
+        String v = xpath.evaluate(expr, doc);
+        return v == null || v.trim().isEmpty() ? null : v.trim();
     }
 
 }
