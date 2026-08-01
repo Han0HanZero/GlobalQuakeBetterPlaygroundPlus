@@ -77,7 +77,9 @@ public class ShakeMap {
             IntensityHex current = pq.remove();
             result.add(current);
 
-            for (long neighbor : h3.gridDisk(current.id(), res)) {
+            // 只扩展直接邻居（1 环 7 格）。gridDisk 的 k 是环数，误传 res（4~8）会每次生成 61~217 个候选格，
+            // 使一次 ShakeMap 生成产生数万次几何计算（refreshShakemaps 每秒重建一次 → 持续高 CPU）
+            for (long neighbor : h3.gridDisk(current.id(), 1)) {
                 if (visited.contains(neighbor)) {
                     continue;
                 }

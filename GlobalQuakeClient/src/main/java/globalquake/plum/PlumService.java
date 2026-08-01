@@ -85,9 +85,13 @@ public class PlumService {
     private volatile Point2D maxMeasuredPos;
     // 按 h3 cell 聚合的实测 max（当前 Settings.plumResolution 分桶），供 ShakeMap 快速查表（O(7~127) 替代全站遍历）
     private volatile Map<Long, Double> cellMeasuredPga = Collections.emptyMap();
-    // 强制重算：假定报生命周期内，同一个地震当且仅当有 X 个站（发报最低测站数）检测到晃动时触发一次，
-    // 之后由程序自然决定是否修订（不再手动触发）
+    // 强制重算（已临时禁用）：假定报生命周期内，同一个地震当且仅当有 X 个站（发报最低测站数）检测到晃动时触发一次，
+    // 之后由程序自然决定是否修订（不再手动触发）。当前 tick 内触发逻辑被注释，恢复时一并启用。
     private volatile boolean forcedOnce = false;
+    // 实测烈度版本号：cellMeasuredPga 每轮 tick 更新后递增，供 ShakemapService 判断是否需要增量重建 ShakeMap
+    private volatile long measuredVersion = 0;
+    // 真实正式报已存在、跳过创建假定报的日志冷却（30s 一条，避免每 250ms 刷屏）
+    private long lastSkipLogTime = 0;
 
     private static final class MutableCell {
         final long id;
@@ -160,6 +164,7 @@ public class PlumService {
         cellsView = new ArrayList<>();
         measuredPga = Collections.emptyMap();
         cellMeasuredPga = Collections.emptyMap();
+        measuredVersion++;
         maxMeasuredPga = 0;
         maxMeasuredPos = null;
         fireUpdated();
@@ -259,6 +264,7 @@ public class PlumService {
                 }
             }
             cellMeasuredPga = newCellMeasured;
+            measuredVersion++;
 
             // 2) 候选网格 = 所有含站 cell ∪ 其 gridDisk(1) 邻居（保证任何测站都落在至少一个网格的 30km 内）
             Set<Long> candidateCells = new HashSet<>();
@@ -318,8 +324,9 @@ public class PlumService {
                 newCells.add(new PlumCell(cid, new Point2D(center.lat, center.lng), finalPga, sourcePga, count));
             }
 
-            // 4) レベル法：首台超标 → 创建假定震源正式地震报（定位后修订）
-            boolean anyExceed = !stationFirstExceed.isEmpty();
+            // 4) レベル法：至少 N 个站（设置 plumMinStationsForEEW，默认 2）实测超标 → 创建假定震源正式地震报
+            int minTriggerStations = Settings.plumMinStationsForEEW == null ? 2 : clamp(Settings.plumMinStationsForEEW, 1, 100);
+            boolean anyExceed = stationFirstExceed.size() >= minTriggerStations;
 
             synchronized (stateLock) {
                 maxPGA = newMaxPGA;
@@ -335,24 +342,23 @@ public class PlumService {
                     releaseAssumedQuake();
                 }
 
-                // ⑤ 强制重算：假定报生命周期内，同一个地震当且仅当有 X 个站（设置中的发报最低测站数）检测到晃动时，
-                //    触发一次重算（催促尚未发正式报的真实 cluster 立即重算定位→尽快发第2报）；
-                //    之后更多站检测到晃动则不再手动触发，由程序自然决定是否发报/修订
-                if (assumedQuake != null && !forcedOnce) {
-                    int minEewStations = Settings.minimumStationsForEEW == null ? 4 : clamp(Settings.minimumStationsForEEW, 1, 100);
-                    if (stationFirstExceed.size() >= minEewStations) {
-                        forcedOnce = true;
-                        int forced = 0;
-                        for (Cluster c : GlobalQuake.instance.getClusterAnalysis().getClusters()) {
-                            if (c.getEarthquake() == null && !c.getAssignedEvents().isEmpty()) {
-                                c.lastEpicenterUpdate = 0;
-                                forced++;
-                            }
-                        }
-                        Logger.info("PLUM 强制重算触发：%d 个站检测到晃动（最低 %d 站），催促 %d 个未发报聚类簇立即重算定位"
-                                .formatted(stationFirstExceed.size(), minEewStations, forced));
-                    }
-                }
+                // ⑤ 强制重算：已临时禁用（用户测试中）。假定报退出程序流程后，真实 cluster 按原程序逻辑
+                //    在 4~10 站自然发正式报，无需手动催算；如恢复，取消下面整块注释即可。
+//                if (assumedQuake != null && !forcedOnce) {
+//                    int minEewStations = Settings.minimumStationsForEEW == null ? 4 : clamp(Settings.minimumStationsForEEW, 1, 100);
+//                    if (stationFirstExceed.size() >= minEewStations) {
+//                        forcedOnce = true;
+//                        int forced = 0;
+//                        for (Cluster c : GlobalQuake.instance.getClusterAnalysis().getClusters()) {
+//                            if (c.getEarthquake() == null && !c.getAssignedEvents().isEmpty()) {
+//                                c.lastEpicenterUpdate = 0;
+//                                forced++;
+//                            }
+//                        }
+//                        Logger.info("PLUM 强制重算触发：%d 个站检测到晃动（最低 %d 站），催促 %d 个未发报聚类簇立即重算定位"
+//                                .formatted(stationFirstExceed.size(), minEewStations, forced));
+//                    }
+//                }
             }
 
             cellsView = newCells;
@@ -387,8 +393,13 @@ public class PlumService {
             if (q != null && !q.isPlumAssumed() && q.getCluster() != null && q.getCluster().getPreviousHypocenter() != null) {
                 double dist = GeoUtils.greatCircleDistance(q.getLat(), q.getLon(), lat, lon);
                 if (dist < 150.0) {
-                    Logger.info("PLUM skip assumed quake: real EEW already issued at %.3f, %.3f (dist %.1f km)"
-                            .formatted(q.getLat(), q.getLon(), dist));
+                    // 日志降频：真实报持续存在时每 250ms 都会进守卫，30s 只记一条避免刷屏
+                    long nowMs = GlobalQuake.instance.currentTimeMillis();
+                    if (nowMs - lastSkipLogTime > 30_000) {
+                        lastSkipLogTime = nowMs;
+                        Logger.info("PLUM skip assumed quake: real EEW already issued at %.3f, %.3f (dist %.1f km)"
+                                .formatted(q.getLat(), q.getLon(), dist));
+                    }
                     return;
                 }
             }
@@ -405,8 +416,8 @@ public class PlumService {
 
         Cluster cluster = new Cluster();
         cluster.updateRoot(lat, lon);
-        // 新假定报：允许下一次"4 个站触发一次重算"
-        forcedOnce = false;
+        // 强制重算已临时禁用（见 tick 注释块），恢复时取消下面注释
+//        forcedOnce = false;
         Hypocenter hyp = new Hypocenter(lat, lon, ASSUMED_DEPTH, origin, 0.0, 0,
                 new DepthConfidenceInterval(0, 0), new ArrayList<>());
         hyp.magnitude = ASSUMED_MAGNITUDE;
@@ -529,6 +540,11 @@ public class PlumService {
     /** 全图实测烈度最大值（gal）。 */
     public double getMaxMeasuredPga() {
         return maxMeasuredPga;
+    }
+
+    /** 实测烈度版本号：ShakeMap 增量重建依据（版本不变则无需重建）。 */
+    public long getMeasuredVersion() {
+        return measuredVersion;
     }
 
     /** 实测烈度最大值所在位置（x=lat, y=lon），无实测时为 null。 */

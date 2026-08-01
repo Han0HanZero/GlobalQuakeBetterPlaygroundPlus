@@ -36,6 +36,8 @@ public class ShakemapService {
 
     private final ExecutorService shakemapService = Executors.newSingleThreadExecutor();
     private final ScheduledExecutorService checkService = Executors.newSingleThreadScheduledExecutor();
+    // 上次重建时的 PLUM 实测版本号（refreshShakemaps 增量重建依据）
+    private volatile long lastMeasuredVersion = -1;
 
     private static final List<CityLocation> cities = new ArrayList<>();
 
@@ -104,6 +106,13 @@ public class ShakemapService {
             if (!GlobalQuake.instance.isSimulation() || !Settings.plumEnabled || PlumService.getInstance() == null) {
                 return;
             }
+            // 实测烈度未变化（版本号相同）则跳过整轮重建：ShakeMap 生成（BFS+海洋判定）成本高，
+            // 静止/清空状态无需每秒全量重建
+            long version = PlumService.getInstance().getMeasuredVersion();
+            if (version == lastMeasuredVersion) {
+                return;
+            }
+            lastMeasuredVersion = version;
             List<Earthquake> quakes = new ArrayList<>(GlobalQuake.instance.getEarthquakeAnalysis().getEarthquakes());
             boolean changed = false;
             Set<UUID> active = new HashSet<>();

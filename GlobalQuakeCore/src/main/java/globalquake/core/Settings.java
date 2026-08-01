@@ -189,6 +189,8 @@ public final class Settings {
     public static Boolean plumHybridEnabled;
     public static Boolean plumLevelMethodEnabled;
     public static Integer plumCellMinStations;
+    /** PLUM 假定震源报发出所需的最少实测超标站数（默认 2）。 */
+    public static Integer plumMinStationsForEEW;
 
     static {
         load();
@@ -351,6 +353,7 @@ public final class Settings {
         loadProperty("plumHybridEnabled", "true");
         loadProperty("plumLevelMethodEnabled", "true");
         loadProperty("plumCellMinStations", "1", o -> validateInt(1, 100, (Integer) o));
+        loadProperty("plumMinStationsForEEW", "2", o -> validateInt(1, 100, (Integer) o));
     }
 
     private static void runUpdateService() throws IOException {

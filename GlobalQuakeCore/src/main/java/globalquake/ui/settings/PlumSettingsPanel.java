@@ -17,6 +17,7 @@ public class PlumSettingsPanel extends SettingsPanel {
     private JCheckBox chkBoxHybrid;
     private JCheckBox chkBoxLevelMethod;
     private JTextField textFieldMinStations;
+    private JTextField textFieldMinStationsEEW;
 
     public PlumSettingsPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -46,6 +47,12 @@ public class PlumSettingsPanel extends SettingsPanel {
         minStationsPanel.add(textFieldMinStations);
         add(minStationsPanel);
 
+        JPanel minStationsEEWPanel = new JPanel();
+        minStationsEEWPanel.add(new JLabel(I18n.get("settings.plum.minStationsEEW")));
+        textFieldMinStationsEEW = new JTextField(String.valueOf(Settings.plumMinStationsForEEW), 5);
+        minStationsEEWPanel.add(textFieldMinStationsEEW);
+        add(minStationsEEWPanel);
+
         fill(this, 20);
     }
 
@@ -59,6 +66,8 @@ public class PlumSettingsPanel extends SettingsPanel {
         Settings.plumLevelMethodEnabled = chkBoxLevelMethod.isSelected();
         Settings.plumCellMinStations = parseInt(textFieldMinStations.getText(),
                 I18n.get("settings.plum.minStations"), 1, 100);
+        Settings.plumMinStationsForEEW = parseInt(textFieldMinStationsEEW.getText(),
+                I18n.get("settings.plum.minStationsEEW"), 1, 100);
     }
 
     @Override

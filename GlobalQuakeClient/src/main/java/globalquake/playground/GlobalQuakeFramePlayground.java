@@ -418,31 +418,39 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         Logger.info("Deleted all " + stationCount + " stations.");
     }
 
+    // 记住上次「自定义地震」菜单的配置（震级/经纬度/深度/延迟），下次打开默认沿用；经纬度首次用视图中心
+    private static double lastCustomMag = 4.0;
+    private static Double lastCustomLat = null;
+    private static Double lastCustomLon = null;
+    private static double lastCustomDepth = 10.0;
+    private static int lastCustomDelay = 0;
+
     /**
      * 自定义模拟地震参数对话框：输入震级、震中经纬度、震源深度、发震延迟（秒）。
      */
     private void showCustomEarthquakeDialog() {
         GlobalQuakePanel gqPanel = (GlobalQuakePanel) panel;
-        double defaultLat = gqPanel.getRenderer().getRenderProperties().centerLat;
-        double defaultLon = gqPanel.getRenderer().getRenderProperties().centerLon;
+        // 记住上次自定义地震配置（震级/经纬度/深度/延迟），下次打开对话框默认沿用；经纬度首次用视图中心
+        double defaultLat = lastCustomLat != null ? lastCustomLat : gqPanel.getRenderer().getRenderProperties().centerLat;
+        double defaultLon = lastCustomLon != null ? lastCustomLon : gqPanel.getRenderer().getRenderProperties().centerLon;
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JTextField magField = new JTextField("4.0", 10);
+        JTextField magField = new JTextField(String.valueOf(lastCustomMag), 10);
         JTextField latField = new JTextField(String.format("%.4f", defaultLat), 10);
         JTextField lonField = new JTextField(String.format("%.4f", defaultLon), 10);
-        JTextField depthField = new JTextField("10.0", 10);
-        JTextField delayField = new JTextField("0", 10);
+        JTextField depthField = new JTextField(String.valueOf(lastCustomDepth), 10);
+        JTextField delayField = new JTextField(String.valueOf(lastCustomDelay), 10);
 
         String[][] fields = {
-                {I18n.get("playground.custom.magnitude"), "4.0"},
+                {I18n.get("playground.custom.magnitude"), String.valueOf(lastCustomMag)},
                 {I18n.get("playground.custom.latitude"), String.format("%.4f", defaultLat)},
                 {I18n.get("playground.custom.longitude"), String.format("%.4f", defaultLon)},
-                {I18n.get("playground.custom.depth"), "10.0"},
-                {I18n.get("playground.custom.delay"), "0"}
+                {I18n.get("playground.custom.depth"), String.valueOf(lastCustomDepth)},
+                {I18n.get("playground.custom.delay"), String.valueOf(lastCustomDelay)}
         };
 
         for (int i = 0; i < fields.length; i++) {
@@ -504,6 +512,11 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
         }
 
         final double fMag = mag, fLat = lat, fLon = lon, fDepth = depth;
+        lastCustomMag = mag;
+        lastCustomLat = lat;
+        lastCustomLon = lon;
+        lastCustomDepth = depth;
+        lastCustomDelay = delaySec;
 
         if (delaySec == 0) {
             ((GlobalQuakePanelPlayground) panel)._createDebugEarthquake(fMag, fDepth, fLat, fLon);
