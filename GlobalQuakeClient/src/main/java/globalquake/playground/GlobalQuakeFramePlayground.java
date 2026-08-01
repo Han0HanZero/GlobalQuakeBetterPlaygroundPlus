@@ -417,6 +417,10 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
                 JOptionPane.WARNING_MESSAGE);
         if (confirm != JOptionPane.YES_OPTION) return;
 
+        // 清空 PLUM 状态（stationFirstExceed 等持有站引用，不清理会导致被删站及其
+        // 数百 KB 波形缓冲无法回收，几轮模拟后堆持续增长 → GC 压力 → 帧率下降/卡顿）
+        PlumService.resetIfPresent();
+
         for (AbstractStation station : stationManager.getStations()) {
             station.clear();
         }
