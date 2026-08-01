@@ -10,6 +10,7 @@ import globalquake.events.specific.ShakeMapsUpdatedEvent;
 import globalquake.intensity.IntensityHex;
 import globalquake.core.intensity.IntensityScales;
 import globalquake.core.intensity.Level;
+import globalquake.core.intensity.LevelPalette;
 import globalquake.intensity.ShakeMap;
 import globalquake.client.GlobalQuakeLocal;
 import globalquake.ui.globe.GlobeRenderer;
@@ -156,7 +157,7 @@ public class FeatureShakemap extends RenderFeature<IntensityHex> {
             return;
         }
 
-        Color col = level.getColor();
+        Color col = LevelPalette.bg(level);
 
         graphics.setStroke(new BasicStroke(1.0f));
         graphics.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 100));

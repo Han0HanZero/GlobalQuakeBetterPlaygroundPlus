@@ -6,6 +6,7 @@ import globalquake.core.Settings;
 import globalquake.core.geo.DistanceUnit;
 import globalquake.core.intensity.IntensityScale;
 import globalquake.core.intensity.IntensityScales;
+import globalquake.core.intensity.LevelPalette;
 import globalquake.ui.i18n.I18n;
 
 import javax.swing.*;
@@ -211,7 +212,7 @@ public class GeneralSettingsPanel extends SettingsPanel {
 	}
 
 	private JPanel createIntensitySettingsPanel() {
-		JPanel panel = new JPanel(new GridLayout(2,1));
+		JPanel panel = new JPanel(new GridLayout(3,1));
 		panel.setBorder(BorderFactory.createTitledBorder(I18n.get("settings.intensityScale")));
 
 		comboBoxScale = new JComboBox<>(IntensityScales.INTENSITY_SCALES);
@@ -232,6 +233,25 @@ public class GeneralSettingsPanel extends SettingsPanel {
 		JPanel div = new JPanel();
 		div.add(comboBoxScale);
 		panel.add(div, BorderLayout.CENTER);
+
+		// 全局烈度配色方案
+		JPanel divPalette = new JPanel();
+		JComboBox<String> paletteComboBox = new JComboBox<>(new String[]{
+				I18n.get("settings.palette.default"),
+				I18n.get("settings.palette.kanameishi"),
+				I18n.get("settings.palette.srev")
+		});
+		paletteComboBox.setSelectedIndex(Settings.intensityPalette == null ? 0 : Settings.intensityPalette);
+		paletteComboBox.addActionListener(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				Settings.intensityPalette = paletteComboBox.getSelectedIndex();
+				LevelPalette.setCurrent(Settings.intensityPalette);
+			}
+		});
+		divPalette.add(new JLabel(I18n.get("settings.intensityPalette")));
+		divPalette.add(paletteComboBox);
+		panel.add(divPalette);
 
 		JLabel lbl = new JLabel();
 		lbl.setFont(GQFonts.font(Font.PLAIN, 13));

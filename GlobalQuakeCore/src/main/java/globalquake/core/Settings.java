@@ -5,6 +5,7 @@ import globalquake.core.earthquake.quality.QualityClass;
 import globalquake.core.exception.RuntimeApplicationException;
 import globalquake.core.geo.DistanceUnit;
 import globalquake.core.intensity.IntensityScales;
+import globalquake.core.intensity.LevelPalette;
 import globalquake.ui.settings.StationsShape;
 import org.tinylog.Logger;
 
@@ -192,6 +193,9 @@ public final class Settings {
     /** PLUM 假定震源报发出所需的最少实测超标站数（默认 2）。 */
     public static Integer plumMinStationsForEEW;
 
+    /** 全局烈度配色方案：0 默认 / 1 要石 / 2 SREV */
+    public static Integer intensityPalette;
+
     static {
         load();
         save();
@@ -354,6 +358,10 @@ public final class Settings {
         loadProperty("plumLevelMethodEnabled", "true");
         loadProperty("plumCellMinStations", "1", o -> validateInt(1, 100, (Integer) o));
         loadProperty("plumMinStationsForEEW", "2", o -> validateInt(1, 100, (Integer) o));
+
+        // ---- 全局烈度配色方案 ----
+        loadProperty("intensityPalette", "0", o -> validateInt(0, 2, (Integer) o));
+        LevelPalette.setCurrent(intensityPalette == null ? 0 : intensityPalette);
     }
 
     private static void runUpdateService() throws IOException {

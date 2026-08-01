@@ -6,6 +6,7 @@ import globalquake.core.archive.ArchivedQuake;
 import globalquake.core.earthquake.quality.QualityClass;
 import globalquake.core.intensity.IntensityScales;
 import globalquake.core.intensity.Level;
+import globalquake.core.intensity.LevelPalette;
 import globalquake.ui.i18n.I18n;
 import globalquake.ui.archived.ArchivedQuakeAnimation;
 import globalquake.ui.archived.ArchivedQuakeUI;
@@ -137,7 +138,7 @@ public class EarthquakeListPanel extends JPanel {
                 Color col;
                 Level level = IntensityScales.getIntensityScale().getLevel(quake.getMaxPGA());
                 if (level != null) {
-                    col = level.getColor();
+                    col = LevelPalette.bg(level);
 
 
                     col = new Color(

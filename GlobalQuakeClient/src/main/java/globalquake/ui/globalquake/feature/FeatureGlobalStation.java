@@ -23,6 +23,7 @@ import globalquake.ui.globe.feature.RenderFeature;
 import globalquake.core.Settings;
 import globalquake.core.intensity.IntensityScales;
 import globalquake.core.intensity.Level;
+import globalquake.core.intensity.LevelPalette;
 import globalquake.ui.settings.StationsShape;
 import globalquake.ui.stationselect.FeatureSelectableStation;
 import globalquake.utils.GeoUtils; // 调试日志备用 import（与上面调试代码配套）
@@ -34,8 +35,12 @@ import java.awt.*;
 import java.io.FileWriter; // 调试日志备用 import
 import java.io.PrintWriter; // 调试日志备用 import
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong; // 调试日志备用 import
+import java.util.stream.Collectors;
 
 public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
 
@@ -267,6 +272,28 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
     }
 
     @Override
+    public void renderAll(GlobeRenderer renderer, Graphics2D graphics, RenderProperties properties) {
+        // 烈度大的测站浮在上面：先画无烈度站，再按烈度升序画有烈度站（后画的盖在先画的上面）
+        List<RenderEntity<AbstractStation>> visible = getEntities().stream()
+                .filter(this::isEntityVisible)
+                .collect(Collectors.toList());
+
+        Map<RenderEntity<AbstractStation>, Integer> levelIdxMap = new HashMap<>();
+        List<Level> levels = IntensityScales.getIntensityScale().getLevels();
+        for (RenderEntity<AbstractStation> entity : visible) {
+            Level level = computeIntensityLevel((AbstractStation) entity.getOriginal());
+            levelIdxMap.put(entity, level == null ? -1 : levels.indexOf(level));
+        }
+
+        visible.stream()
+                .sorted(Comparator.comparingInt(levelIdxMap::get))
+                .forEach(entity -> {
+                    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                    render(renderer, graphics, entity, properties);
+                });
+    }
+
+    @Override
     public void render(GlobeRenderer renderer, Graphics2D graphics, RenderEntity<AbstractStation> entity, RenderProperties renderProperties) {
         RenderElement elementStationCircle = entity.getRenderElement(0);
 
@@ -288,26 +315,32 @@ public class FeatureGlobalStation extends RenderFeature<AbstractStation> {
         if (level != null && centerPoint != null) {
             List<Level> levels = IntensityScales.getIntensityScale().getLevels();
             int levelIdx = levels.indexOf(level);
-            double radiusPx = (12.0 + Math.max(0, levelIdx) * 0.9) * Settings.stationsSizeMul;
+            double radiusPx = (8.0 + Math.max(0, levelIdx) * 0.6) * Settings.stationsSizeMul;
             int r = (int) Math.round(radiusPx);
             int cx = (int) Math.round(centerPoint.x);
             int cy = (int) Math.round(centerPoint.y);
-            graphics.setColor(level.getColor());
+            graphics.setColor(LevelPalette.bg(level));
             graphics.fillOval(cx - r, cy - r, r * 2, r * 2);
-            graphics.setColor(Color.white);
+            graphics.setColor(LevelPalette.border(level));
             graphics.setStroke(new BasicStroke(1.5f));
             graphics.drawOval(cx - r, cy - r, r * 2, r * 2);
             graphics.setStroke(new BasicStroke(1f));
-            int fontSize = Math.max(10, Math.min(r * 2 / Math.max(1, level.getFullName().length()), r));
+            int fontSize = Math.max(12, Math.min(r * 2 / Math.max(1, level.getFullName().length()), r + 4));
             graphics.setFont(GQFonts.font(Font.BOLD, fontSize));
             FontMetrics fm = graphics.getFontMetrics();
             String label = level.getFullName();
             int tw = fm.stringWidth(label);
             int th = fm.getAscent();
-            graphics.setColor(Color.black);
-            graphics.drawString(label, cx - tw / 2 + 1, cy + th / 2 - 2 + 1);
-            graphics.setColor(Color.white);
-            graphics.drawString(label, cx - tw / 2, cy + th / 2 - 2);
+            if (LevelPalette.noShadow()) {
+                // 非默认配色方案：数字不加阴影
+                graphics.setColor(LevelPalette.fg(level));
+                graphics.drawString(label, cx - tw / 2, cy + th / 2 - 2);
+            } else {
+                graphics.setColor(Color.black);
+                graphics.drawString(label, cx - tw / 2 + 1, cy + th / 2 - 2 + 1);
+                graphics.setColor(Color.white);
+                graphics.drawString(label, cx - tw / 2, cy + th / 2 - 2);
+            }
         } else {
             graphics.setColor(getDisplayColor(station));
             graphics.fill(elementStationCircle.getShape());

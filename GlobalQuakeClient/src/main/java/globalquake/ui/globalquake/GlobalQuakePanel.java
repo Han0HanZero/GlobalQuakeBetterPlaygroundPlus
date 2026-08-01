@@ -27,6 +27,7 @@ import globalquake.utils.GeoUtils;
 import globalquake.core.geo.taup.TauPTravelTimeCalculator;
 import globalquake.core.intensity.IntensityScales;
 import globalquake.core.intensity.Level;
+import globalquake.core.intensity.LevelPalette;
 import globalquake.intensity.ShakeMap;
 import globalquake.sounds.Sounds;
 import globalquake.ui.StationMonitor;
@@ -249,7 +250,7 @@ public class GlobalQuakePanel extends GlobePanel {
 
             int levelW = g.getFontMetrics().stringWidth(levelStr);
 
-            g.setColor(level.getColor());
+            g.setColor(LevelPalette.bg(level));
             g.drawString(levelStr, getWidth() - levelW - 6, y);
 
             String str = "%s: ".formatted(StringUtils.truncate(city.city().name(), 18));
@@ -583,7 +584,7 @@ public class GlobalQuakePanel extends GlobePanel {
         ShakeMap shakeMap = quake == null ? null : GlobalQuakeLocal.instance.getShakemapService().getShakeMaps().get(quake.getUuid());
 
         Level level = shakeMap == null ? null : IntensityScales.getIntensityScale().getLevel(shakeMap.getMaxPGA());
-        Color levelColor = level == null ? Color.gray : level.getColor();
+        Color levelColor = level == null ? Color.gray : LevelPalette.bg(level);
 
         Font regionFont = GQFonts.font(Font.BOLD, 18);
         Font quakeFont = GQFonts.font(Font.BOLD, 22);
@@ -791,7 +792,7 @@ public class GlobalQuakePanel extends GlobePanel {
         Color col = BLUE_COLOR;
 
         if (level != null) {
-            col = level.getColor();
+            col = LevelPalette.bg(level);
             col = new Color(
                     (int) (col.getRed() * IntensityScales.getIntensityScale().getDarkeningFactor()),
                     (int) (col.getGreen() * IntensityScales.getIntensityScale().getDarkeningFactor()),
