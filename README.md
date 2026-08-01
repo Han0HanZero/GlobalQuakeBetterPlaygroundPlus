@@ -1,6 +1,6 @@
 # GlobalQuake: Better Playground Plus
 
-![IIIA-4](https://img.shields.io/badge/IIIA-4-9370DB)](https://github.com/ErSanSan233/IIIA)
+[![IIIA-4](https://img.shields.io/badge/IIIA-4-9370DB)](https://github.com/ErSanSan233/IIIA)
 
 本项目基于Global Quake v0.11.0_pre-1，由我使用TRAE、DeepSeek魔改。所有代码未经人类验证。
 
