@@ -181,6 +181,15 @@ public final class Settings {
     @SuppressWarnings("unused")
     public static Boolean debugSendPGV;
 
+    // ---- PLUM 法（Playground，简易版）----
+    public static Boolean plumEnabled;
+    public static Integer plumResolution;
+    public static Integer plumThresholdScale;
+    public static Integer plumThresholdLevel;
+    public static Boolean plumHybridEnabled;
+    public static Boolean plumLevelMethodEnabled;
+    public static Integer plumCellMinStations;
+
     static {
         load();
         save();
@@ -331,6 +340,17 @@ public final class Settings {
         loadProperty("oldEventsMagnitudeFilter", "4.0", o -> validateDouble(0, 10, (Double) o));
         loadProperty("oldEventsOpacity", "100.0", o -> validateDouble(0, 100, (Double) o));
         loadProperty("brushStationSpacingKm", "50", o -> validateDouble(1, 2000, (Double) o));
+
+        // ---- PLUM 法（Playground，简易版）----
+        loadProperty("plumEnabled", "true");
+        loadProperty("plumResolution", "4", o -> validateInt(4, 9, (Integer) o));
+        loadProperty("plumThresholdScale", "1",
+                o -> validateInt(0, IntensityScales.INTENSITY_SCALES.length - 1, (Integer) o));
+        loadProperty("plumThresholdLevel", "3",
+                o -> validateInt(0, IntensityScales.INTENSITY_SCALES[plumThresholdScale].getLevels().size() - 1, (Integer) o));
+        loadProperty("plumHybridEnabled", "true");
+        loadProperty("plumLevelMethodEnabled", "true");
+        loadProperty("plumCellMinStations", "1", o -> validateInt(1, 100, (Integer) o));
     }
 
     private static void runUpdateService() throws IOException {

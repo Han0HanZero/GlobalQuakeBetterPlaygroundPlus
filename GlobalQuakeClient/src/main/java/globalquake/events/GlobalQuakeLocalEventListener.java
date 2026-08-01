@@ -17,4 +17,6 @@ public class GlobalQuakeLocalEventListener {
     public void onSocketReconnect(SocketReconnectEvent ignoredSocketReconnectEvent) {}
 
     public void onStationCreate(StationCreateEvent stationCreateEvent) {}
+
+    public void onPlumUpdated(PlumUpdatedEvent event) {}
 }

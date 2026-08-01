@@ -7,6 +7,7 @@ import globalquake.core.earthquake.data.Earthquake;
 import globalquake.core.events.specific.QuakeRemoveEvent;
 import globalquake.core.station.AbstractStation;
 import globalquake.main.Main;
+import globalquake.plum.PlumService;
 import globalquake.ui.globalquake.EarthquakeListPanel;
 import globalquake.ui.globalquake.GlobalQuakeFrame;
 import globalquake.ui.globalquake.GlobalQuakePanel;
@@ -357,6 +358,9 @@ public class GlobalQuakeFramePlayground extends GlobalQuakeFrame {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
         if (confirm != JOptionPane.YES_OPTION) return;
+
+        // 0. 重置 PLUM 网格与警报状态
+        PlumService.resetIfPresent();
 
         // 1. 清除 Playground 地震集合（波形生成器遍历这个集合产生信号）
         gq.getPlaygroundEarthquakes().clear();

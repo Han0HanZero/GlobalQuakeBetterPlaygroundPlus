@@ -545,10 +545,13 @@ public class EarthquakeAnalysis {
             obviousCorrectPct = bestHypocenter.obviousArrivalsInfo.getPCT();
         }
 
+        double obviousThreshold = OBVIOUS_CORRECT_THRESHOLD;
+        double obviousDeleteThreshold = OBVIOUS_CORRECT_DELETE_THRESHOLD;
+
         double pct = 100 * bestHypocenter.getCorrectness();
-        boolean valid = pct >= finderSettings.correctnessThreshold() && bestHypocenter.correctEvents >= finderSettings.minStations() && obviousCorrectPct >= OBVIOUS_CORRECT_THRESHOLD;
+        boolean valid = pct >= finderSettings.correctnessThreshold() && bestHypocenter.correctEvents >= finderSettings.minStations() && obviousCorrectPct >= obviousThreshold;
         if (!valid) {
-            boolean remove = pct < finderSettings.correctnessThreshold() * 0.75 || bestHypocenter.correctEvents < finderSettings.minStations() * 0.75 || obviousCorrectPct < OBVIOUS_CORRECT_DELETE_THRESHOLD;
+            boolean remove = pct < finderSettings.correctnessThreshold() * 0.75 || bestHypocenter.correctEvents < finderSettings.minStations() * 0.75 || obviousCorrectPct < obviousDeleteThreshold;
             Earthquake earthquake1 = cluster.getEarthquake();
             if (remove && earthquake1 != null) {
                 removeQuake(cluster, earthquake1);
@@ -1120,6 +1123,13 @@ public class EarthquakeAnalysis {
         }
 
         mags.sort(Comparator.comparing(MagnitudeReading::eventAge));
+
+        // 清除/重置时事件可能被并发置为无效，导致 mags 为空（此前 mags.get(-1) 崩溃）
+        if (mags.isEmpty()) {
+            hypocenterAssign.mags = null;
+            hypocenterAssign.magnitude = NO_MAGNITUDE;
+            return;
+        }
 
         int minSize = 4;
         long ageLimit = Math.max(2000, Math.min(16000, mags.get((int) (mags.size() * 0.25 - 1)).eventAge()));

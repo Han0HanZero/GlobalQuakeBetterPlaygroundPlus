@@ -106,7 +106,7 @@ public interface GeoUtils {
 		return FastMath.sqrt(s2);
 	}
 
-	static double greatCircleDistance(double lat1, double lon1, double lat2, double lon2) {
+	public static double greatCircleDistance(double lat1, double lon1, double lat2, double lon2) {
 		// Convert latitude and longitude from degrees to radians
 		lat1 = Math.toRadians(lat1);
 		lon1 = Math.toRadians(lon1);
@@ -144,7 +144,7 @@ public interface GeoUtils {
 		return bearing;
 	}
 
-	static double geologicalDistance(double lat1, double lon1, double alt1, double lat2, double lon2,
+	public static double geologicalDistance(double lat1, double lon1, double alt1, double lat2, double lon2,
 									 double alt2) {
 		alt1 += EARTH_RADIUS;
 		alt2 += EARTH_RADIUS;
@@ -163,7 +163,7 @@ public interface GeoUtils {
 		return GeoUtils.pgaFunction(mag, distGEO, depth);
 	}
 
-	static double pgaFunction(double mag, double distKm, double depth) {
+	public static double pgaFunction(double mag, double distKm, double depth) {
 		return pgaFunctionGen2(
 				mag + 0.4 * EarthquakeAnalysis.getDepthCorrection(depth),
 				distKm / (1.0 + 0.75 * EarthquakeAnalysis.getDepthCorrection(depth)));

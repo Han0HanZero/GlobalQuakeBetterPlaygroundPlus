@@ -11,6 +11,7 @@ import globalquake.core.exception.ApplicationErrorHandler;
 import globalquake.core.regions.Regions;
 import globalquake.core.station.GlobalStationManager;
 import globalquake.main.Main;
+import globalquake.plum.PlumService;
 import globalquake.sounds.Sounds;
 import globalquake.utils.Scale;
 import globalquake.utils.monitorable.MonitorableCopyOnWriteArrayList;
@@ -65,6 +66,7 @@ public class GlobalQuakePlayground extends GlobalQuakeLocal {
         super(new StationDatabaseManagerPlayground(), new GlobalStationManagerPlayground());
         new WaveformGenerator(this);
         createdAtMillis = System.currentTimeMillis();
+        new PlumService(); // 在 createdAtMillis 之后创建，保证模拟时钟一致
         findStationsFolder();
         createFrame();
         startRuntime();
@@ -170,5 +172,13 @@ public class GlobalQuakePlayground extends GlobalQuakeLocal {
     @Override
     public boolean isSimulation() {
         return true;
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        if (PlumService.getInstance() != null) {
+            PlumService.getInstance().stop();
+        }
     }
 }

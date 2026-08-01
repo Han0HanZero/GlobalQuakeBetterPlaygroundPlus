@@ -146,6 +146,11 @@ public class ClusterAnalysis {
 
     private void mergeClusters() {
         for (Earthquake earthquake : earthquakes) {
+            // PLUM 假定震源报：仅作预警占位，不参与聚类合并（否则真实 cluster 的事件会被吞进假定报而闲置，
+            // 正式报要等上百个站才偶然发出）。真实 cluster 保持独立，按原程序逻辑正常发正式报。
+            if (earthquake.isPlumAssumed()) {
+                continue;
+            }
             List<Cluster> toMerge = null;
 
             for (Cluster cluster : clusters) {

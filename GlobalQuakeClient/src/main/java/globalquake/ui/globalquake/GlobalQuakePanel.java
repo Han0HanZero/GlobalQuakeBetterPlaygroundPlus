@@ -723,6 +723,10 @@ public class GlobalQuakePanel extends GlobePanel {
         g.drawString(str, x + width / 2 - g.getFontMetrics().stringWidth(str) / 2, y + 36);
 
         Quality quality = quake.getCluster().getPreviousHypocenter().quality;
+        // PLUM 假定报的 Hypocenter 手工构造时未设置 quality（null），修订前跳过精度框绘制
+        if (quality == null) {
+            return;
+        }
 
         drawAccuracyBox(g, true, I18n.get("panel.errDepth"), (int) (x + width * 0.55), y + 56,
                 units.format(quality.getQualityDepth().getValue(), 1), quality.getQualityDepth().getQualityClass().getColor());

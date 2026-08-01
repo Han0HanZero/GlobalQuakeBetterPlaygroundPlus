@@ -3,6 +3,7 @@ package globalquake.playground;
 import globalquake.core.GQFonts;
 
 import globalquake.core.GlobalQuake;
+import globalquake.core.Settings;
 import globalquake.core.earthquake.data.Cluster;
 import globalquake.core.earthquake.data.Earthquake;
 import globalquake.core.earthquake.data.Hypocenter;
@@ -11,6 +12,7 @@ import globalquake.core.earthquake.interval.DepthConfidenceInterval;
 import globalquake.core.earthquake.interval.PolygonConfidenceInterval;
 import globalquake.core.events.specific.QuakeRemoveEvent;
 import globalquake.core.station.AbstractStation;
+import globalquake.plum.PlumService;
 import globalquake.ui.globalquake.GlobalQuakePanel;
 import globalquake.ui.globe.GlobeRenderer;
 import globalquake.ui.globe.Polygon3D;
@@ -30,6 +32,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.*;
 import java.util.List;
@@ -176,6 +179,7 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
                 }
 
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    PlumService.resetIfPresent();
                     ((GlobalQuakePlayground) GlobalQuake.instance).getPlaygroundEarthquakes().clear();
                     for (Earthquake earthquake : GlobalQuake.instance.getEarthquakeAnalysis().getEarthquakes()) {
                         GlobalQuake.instance.getEventHandler().fireEvent(new QuakeRemoveEvent(earthquake));
@@ -554,6 +558,7 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
     public void paint(Graphics gr) {
         super.paint(gr);
         var g = ((Graphics2D) gr);
+
         String str = ((GlobalQuakePlayground) GlobalQuake.getInstance()).getWatermark();
         g.setColor(new Color(255, 100, 0, (int) ((1.0 + Math.sin(System.currentTimeMillis() / 300.0)) * 40.0 + 80)));
 
@@ -657,7 +662,6 @@ public class GlobalQuakePanelPlayground extends GlobalQuakePanel {
             g.drawString(brushInfo, getWidth() / 2 - g.getFontMetrics().stringWidth(brushInfo) / 2, infoY);
         }
     }
-
     private String getDescription(InsertType insertType) {
         return switch (insertType) {
             case EARTHQUAKE -> I18n.get("playground.desc.earthquake");

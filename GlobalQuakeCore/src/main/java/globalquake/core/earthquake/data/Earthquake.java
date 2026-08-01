@@ -26,6 +26,8 @@ public class Earthquake implements Regional, Warnable {
     private final Cluster cluster;
     public int nextReportEventCount;
     private String region;
+    /** PLUM 法假定震源报标记：其 cluster 等待真实事件流入后被程序自然修订，不受"事件数过少即移除"限制。 */
+    private boolean plumAssumed;
 
     private final RegionUpdater regionUpdater;
     private double lastLat;
@@ -125,6 +127,14 @@ public class Earthquake implements Regional, Warnable {
     @Override
     public void setRegion(String newRegion) {
         this.region = newRegion;
+    }
+
+    public boolean isPlumAssumed() {
+        return plumAssumed;
+    }
+
+    public void setPlumAssumed(boolean plumAssumed) {
+        this.plumAssumed = plumAssumed;
     }
 
     @Override
